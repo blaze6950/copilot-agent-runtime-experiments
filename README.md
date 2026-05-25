@@ -13,6 +13,8 @@ Research and prototype repository for experimenting with:
 > This repository is experimental and research-oriented.
 > The workflows, prompts and architecture patterns are still evolving.
 
+**[→ Live Presentation](https://blaze6950.github.io/copilot-agent-runtime-experiments/)**
+
 ---
 
 # Repository Structure
@@ -20,8 +22,8 @@ Research and prototype repository for experimenting with:
 ```text
 .
 ├── README.md
-├── presentation/
-│   └── agent-runtime-presentation.html
+├── docs/
+│   └── index.html
 ├── scripts/
 │   ├── README.md
 │   ├── analyze-events.csx
@@ -45,7 +47,7 @@ Research and prototype repository for experimenting with:
 
 # Contents
 
-## presentation/
+## docs/
 
 Contains the original HTML presentation used during a talk.
 
@@ -63,6 +65,8 @@ The presentation covers topics such as:
 - Observability gaps in current runtimes
 
 The presentation is self-contained and can be opened directly in any browser.
+
+**[→ Live Presentation](https://blaze6950.github.io/copilot-agent-runtime-experiments/)**
 
 ## scripts/
 
