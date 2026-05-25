@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Agents: A Powerful Tool. An Expensive One. Let's Use It Right.</title>
+
+  <!-- Reveal.js CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:       #0d1117;
+      --bg2:      #161b22;
+      --bg3:      #21262d;
+      --border:   #30363d;
+      --blue:     #58a6ff;
+      --green:    #3fb950;
+      --yellow:   #e3b341;
+      --red:      #f78166;
+      --purple:   #bc8cff;
+      --text:     #e6edf3;
+      --muted:    #8b949e;
+      --demo-bg:  rgba(88,166,255,0.12);
+      --demo-border: #58a6ff;
+    }
+
+    .reveal { font-family: 'Inter', sans-serif; font-size: 28px; }
+    .reveal .slides { text-align: left; }
+    .reveal section { padding: 0 0.4em; height: 100%; }
+    .reveal h1, .reveal h2, .reveal h3 { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.02em; text-transform: none; }
+
+    /* ── Section label ── */
+    .section-label {
+      display: inline-block;
+      font-size: 0.45em;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      border: 1px solid var(--blue);
+      border-radius: 4px;
+      padding: 2px 10px;
+      margin-bottom: 0.5em;
+    }
+
+    /* ── Demo badge ── */
+    .demo-badge {
+      display: inline-block;
+      background: var(--demo-bg);
+      border: 1px solid var(--demo-border);
+      color: var(--blue);
+      font-size: 0.42em;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 12px;
+      border-radius: 4px;
+      margin-left: 0.6em;
+      vertical-align: middle;
+    }
+
+    /* ── Callout box ── */
+    .callout {
+      background: rgba(227,179,65,0.1);
+      border-left: 4px solid var(--yellow);
+      border-radius: 0 6px 6px 0;
+      padding: 0.4em 0.8em;
+      margin: 0.4em 0;
+      font-size: 0.65em;
+    }
+    .callout.blue  { background: rgba(88,166,255,0.1);  border-color: var(--blue); }
+    .callout.green { background: rgba(63,185,80,0.1);   border-color: var(--green); }
+    .callout.red   { background: rgba(247,129,102,0.1); border-color: var(--red); }
+
+    /* ── Tables ── */
+    .reveal table {
+      font-size: 0.56em;
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0.3em 0;
+    }
+    .reveal table th {
+      background: var(--bg3);
+      color: var(--blue);
+      font-weight: 600;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    .reveal table td {
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .reveal table tr:nth-child(even) td { background: var(--bg2); }
+    .reveal table tr:nth-child(odd)  td { background: var(--bg); }
+
+    /* ── Two-column layout ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; align-items: start; }
+    .two-col-3-2 { display: grid; grid-template-columns: 3fr 2fr; gap: 1em; align-items: start; }
+
+    /* ── Panel cards ── */
+    .panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6em 0.85em;
+    }
+    .panel h4 { margin: 0 0 0.3em; font-size: 0.65em; color: var(--blue); text-transform: uppercase; letter-spacing: 0.08em; }
+    .panel ul { margin: 0; padding-left: 1.1em; font-size: 0.62em; color: var(--text); }
+    .panel ul li { margin-bottom: 0.25em; }
+
+    /* ── Tier boxes ── */
+    .tier-box {
+      border-radius: 8px;
+      padding: 0.5em 0.8em;
+      margin-bottom: 0.4em;
+      font-size: 0.6em;
+    }
+    .tier-1 { background: rgba(188,140,255,0.12); border: 1px solid var(--purple); }
+    .tier-2 { background: rgba(88,166,255,0.12);  border: 1px solid var(--blue); }
+    .tier-3 { background: rgba(63,185,80,0.12);   border: 1px solid var(--green); }
+    .tier-box strong { font-size: 1.05em; }
+
+    /* ── Big number ── */
+    .big-number { font-size: 2em; font-weight: 800; color: var(--red); line-height: 1; }
+    .big-number.green { color: var(--green); }
+    .big-number.blue  { color: var(--blue); }
+
+    /* ── Code / mono ── */
+    .mono { font-family: 'JetBrains Mono', monospace; background: var(--bg3); border-radius: 4px; padding: 1px 6px; font-size: 0.85em; color: var(--green); }
+
+    /* ── Slide title override ── */
+    .reveal h2 { font-size: 1.2em; margin-bottom: 0.3em; color: var(--text); }
+    .reveal h1 { font-size: 1.55em; color: var(--text); }
+    .reveal ul  { font-size: 0.65em; line-height: 1.65; }
+    .reveal li  { margin-bottom: 0.15em; }
+
+    /* ── Thesis callout on title ── */
+    .thesis {
+      background: rgba(63,185,80,0.1);
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      padding: 0.5em 1em;
+      margin-top: 0.7em;
+      font-size: 0.65em;
+      color: var(--green);
+      font-style: italic;
+    }
+
+    /* ── Scenario label ── */
+    .scenario-a { color: var(--green); font-weight: 700; }
+    .scenario-b { color: var(--yellow); font-weight: 700; }
+    .scenario-c { color: var(--red); font-weight: 700; }
+
+    /* ── Progress / section header slide ── */
+    .section-hero { text-align: center; padding-top: 1.5em; }
+    .section-hero .num { font-size: 4em; font-weight: 800; color: var(--blue); opacity: 0.25; line-height: 1; }
+    .section-hero h2  { font-size: 1.6em; margin-top: 0.2em; }
+
+    /* ── Tag line ── */
+    .tag { font-size: 0.5em; color: var(--muted); font-style: italic; margin-top: 0.25em; }
+
+    /* ── Reveal overrides ── */
+    .reveal .progress { color: var(--blue); }
+    .reveal .controls { color: var(--blue); }
+
+    /* ── Quote ── */
+    blockquote {
+      background: var(--bg2);
+      border-left: 4px solid var(--blue);
+      border-radius: 0 6px 6px 0;
+      padding: 0.45em 0.9em;
+      font-style: italic;
+      font-size: 0.65em;
+      margin: 0.45em 0;
+      color: var(--text);
+    }
+
+    /* ── Analogy card ── */
+    .analogy-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75em;
+      text-align: center;
+      font-size: 0.6em;
+    }
+    .analogy-card .icon { font-size: 1.8em; margin-bottom: 0.2em; }
+    .analogy-card h4 { color: var(--blue); margin: 0 0 0.25em; font-size: 1.05em; }
+
+    /* ── Comparison table override for production vs convenience ── */
+    .compare-good td { color: var(--green); }
+    .compare-bad  td { color: var(--red); }
+
+    /* small muted text */
+    .small { font-size: 0.55em; color: var(--muted); }
+
+    /* ── Vertical-centred slide wrapper ── */
+    .vcenter {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      height: 100%;
+    }
+    /* slide-body: the content block after the heading — centers vertically in remaining space */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ══════════════════════════════════════════════════════
+     SECTION 1 — HOOK & FRAMING
+     ══════════════════════════════════════════════════════ -->
+
+<!-- SLIDE 1: Title -->
+<section data-background-color="#0d1117">
+  <div style="display:flex; flex-direction:column; height:100%; justify-content:space-between; padding:0.3em 0;">
+    <div>
+      <div class="section-label">Section 1 — Hook &amp; Framing</div>
+      <h1 style="font-size:1.45em; line-height:1.2; margin-bottom:0.25em;">
+        AI Agents: A Powerful Tool.<br/>An Expensive One.<br/>
+        <span style="color:var(--blue)">Let's Use It Right.</span>
+      </h1>
+      <p style="font-size:0.65em; color:var(--muted); margin:0.2em 0 0.3em;">
+        How to improve productivity and reduce costs through thoughtful AI agent usage
+      </p>
+      <div class="tag">Based on measured production session data · 2026</div>
+    </div>
+    <div>
+      <div class="thesis">
+        <strong style="font-style:normal; color:var(--green)">Core thesis:</strong>
+        AI agent effectiveness and AI agent cost are the same engineering problem.
+      </div>
+      <p style="font-size:0.62em; color:var(--muted); margin-top:0.5em;">
+        We are entering usage-based pricing. The way we work with AI agents needs to evolve.
+      </p>
+    </div>
+  </div>
+  <aside class="notes">
+    Welcome. This talk is grounded in real measured session data — not vendor benchmarks, not theory.
+    The core thesis will appear three times: here, at the compaction slide, and at the conclusion.
+    Each time it will mean something slightly more concrete than the time before.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     SECTION 2 — NEW REALITY: USAGE-BASED PRICING
+     ══════════════════════════════════════════════════════ -->
+
+<!-- SLIDE 2: Demo — GitHub usage preview -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 2 — New Reality: Usage-Based Pricing</div>
+  <h2>What GitHub Already Knows About Your Usage <span class="demo-badge">Demo</span></h2>
+  <div class="slide-body">
+  <div style="background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:1.4em; margin-top:0.8em; text-align:center;">
+    <svg width="560" height="180" viewBox="0 0 560 180" style="display:block;margin:0 auto;">
+      <!-- Browser chrome -->
+      <rect x="0" y="0" width="560" height="180" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+      <rect x="0" y="0" width="560" height="32" rx="8" fill="#21262d"/>
+      <rect x="0" y="24" width="560" height="8" fill="#21262d"/>
+      <circle cx="20" cy="16" r="5" fill="#f78166" opacity="0.8"/>
+      <circle cx="38" cy="16" r="5" fill="#e3b341" opacity="0.8"/>
+      <circle cx="56" cy="16" r="5" fill="#3fb950" opacity="0.8"/>
+      <rect x="80" y="8" width="320" height="18" rx="4" fill="#0d1117"/>
+      <text x="240" y="21" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e" text-anchor="middle">github.com/settings/copilot/usage-preview</text>
+      <!-- Content area -->
+      <text x="24" y="58" font-family="Inter,sans-serif" font-size="11" fill="#8b949e">GitHub Copilot · Usage-Based Pricing Preview</text>
+      <text x="24" y="78" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#e6edf3">Your projected monthly cost</text>
+      <text x="24" y="108" font-family="Inter,sans-serif" font-size="38" font-weight="800" fill="#f78166">$3,200</text>
+      <text x="130" y="108" font-family="Inter,sans-serif" font-size="11" fill="#8b949e">/ month (single developer)</text>
+      <rect x="24" y="120" width="200" height="8" rx="4" fill="#21262d"/>
+      <rect x="24" y="120" width="168" height="8" rx="4" fill="#f78166" opacity="0.7"/>
+      <text x="24" y="148" font-family="Inter,sans-serif" font-size="10" fill="#8b949e">Based on your real usage data · API-equivalent estimate</text>
+      <text x="24" y="164" font-family="Inter,sans-serif" font-size="10" fill="#58a6ff">↗ See full breakdown</text>
+    </svg>
+  </div>
+  <p style="font-size:0.65em; color:var(--muted); margin-top:0.8em;">
+    Open GitHub's Copilot usage-based pricing preview page live — real personal subscription data.
+  </p>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    This is one developer's personal subscription — not a corporate account, not a power user.
+    Normal engineering usage. What GitHub's own pricing tool projects for this usage under the new billing model.
+    Let that number sit for a moment before moving to the next slide.
+  </aside>
+</section>
+
+<!-- SLIDE 3: What That Number Means -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 2 — New Reality: Usage-Based Pricing</div>
+  <h2>What That Number Means</h2>
+  <div class="slide-body">
+  <div class="two-col" style="gap:1.6em; margin-top:0.6em;">
+    <div>
+      <div class="big-number">$3,200</div>
+      <p style="font-size:0.6em; color:var(--muted); margin:0.2em 0 0.8em;">single developer · 1 month<br/><em>GitHub pricing preview tool · real personal subscription · 2026</em></p>
+      <table>
+        <thead><tr><th>Scale</th><th>Monthly</th><th>Annual</th></tr></thead>
+        <tbody>
+          <tr><td>1 developer</td><td style="color:var(--yellow)">$3,200</td><td style="color:var(--yellow)">$38,400</td></tr>
+          <tr><td>Team of 30</td><td style="color:var(--red)">~$96,000</td><td style="color:var(--red)">~$1,152,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="callout">
+        <strong>This is what ordinary engineering usage becomes under usage-based pricing — before any workflow optimization.</strong>
+      </div>
+      <div class="callout blue" style="margin-top:0.8em;">
+        The <em>optimized</em> workflow result appears in Section 9.<br/>
+        Spoiler: same task, 9–21× lower cost.
+      </div>
+      <p class="small" style="margin-top:0.8em;">Based on GitHub's own pricing preview estimate. API-equivalent pricing; GitHub Copilot billing structure may differ. Order of magnitude, not a precision forecast.</p>
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Scale this to a team. This is before any optimization — this is the default workflow, default settings,
+    one developer doing normal engineering work. The optimized number comes in Section 9.
+  </aside>
+</section>
+
+<!-- SLIDE 4: The Mental Model Shift -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 2 — New Reality: Usage-Based Pricing</div>
+  <h2>The Mental Model Shift</h2>
+  <div class="slide-body">
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1em; margin-top:0.8em;">
+    <div class="analogy-card">
+      <div class="icon">⎇</div>
+      <h4>Git</h4>
+      <p>You learned commits, branches, merges.<br/>You use it deliberately.</p>
+    </div>
+    <div class="analogy-card">
+      <div class="icon">📊</div>
+      <h4>Grafana</h4>
+      <p>You query intentionally.<br/>You scope dashboards.</p>
+    </div>
+    <div class="analogy-card" style="border-color:var(--blue);">
+      <div class="icon">🤖</div>
+      <h4>AI Agents</h4>
+      <p style="color:var(--blue)">Same requirement.<br/>Understand the resource model. Use deliberately.</p>
+    </div>
+  </div>
+  <div class="callout blue" style="margin-top:1em;">
+    AI is a tool. Like Git. Like Grafana. Like your IDE.<br/>
+    To use it well, you need to understand how it consumes resources.
+  </div>
+  <p style="font-size:0.65em; color:var(--muted); margin-top:0.6em;">
+    Transition: to use it well, you need to understand how pricing works.
+  </p>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Nobody uses Git without understanding commits and branches. Nobody uses Grafana without understanding queries.
+    AI agents are no different — they have a resource model, and using them effectively requires understanding it.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     SECTION 3 — HOW TOKEN PRICING WORKS
+     ══════════════════════════════════════════════════════ -->
+
+<!-- SLIDE 5: Token Types and Costs -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 3 — How Token Pricing Works</div>
+  <h2>Token Types and Costs</h2>
+  <div class="slide-body">
+  <table style="margin-top:0.5em;">
+    <thead>
+      <tr>
+        <th>Token Type</th>
+        <th style="color:var(--purple)">Opus 4.6</th>
+        <th style="color:var(--blue)">Sonnet 4.6</th>
+        <th style="color:var(--green)">Haiku 4.5</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Input</strong></td><td>$5 / MTok</td><td>$1.50 / MTok</td><td style="color:var(--green)">$1 / MTok</td></tr>
+      <tr><td><strong style="color:var(--yellow)">Cache Read</strong></td><td style="color:var(--yellow)">$0.50 / MTok</td><td style="color:var(--yellow)">$0.15 / MTok</td><td style="color:var(--yellow)">$0.10 / MTok</td></tr>
+      <tr><td><strong>Cache Write</strong></td><td>$6.25 / MTok</td><td>$1.875 / MTok</td><td>$1.25 / MTok</td></tr>
+      <tr><td><strong style="color:var(--red)">Output</strong></td><td style="color:var(--red)">$25 / MTok</td><td style="color:var(--red)">$7.50 / MTok</td><td style="color:var(--red)">$5 / MTok</td></tr>
+    </tbody>
+  </table>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8em; margin-top:0.8em;">
+    <div class="callout">
+      <strong>Cache reads are 10× cheaper than input tokens.</strong><br/>
+      Your architecture either exploits this or ignores it.
+    </div>
+    <div class="callout red">
+      <strong>Output tokens are 5× more expensive than input.</strong><br/>
+      Verbose agent responses compound quickly.
+    </div>
+  </div>
+  <p style="font-size:0.6em; color:var(--muted); margin-top:0.5em;">Choosing the wrong model for a task is a direct cost multiplier. Anthropic API pricing, May 2026.</p>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Three levers: model selection, cache utilization, output token reduction.
+    Cache reads at $0.10/MTok vs $1/MTok input for Haiku — that's 10x. We'll see in Section 8 how architecture
+    can systematically exploit this.
+  </aside>
+</section>
+
+<!-- SLIDE 6: The Agent Loop -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 3 — How Token Pricing Works</div>
+  <h2>The Agent Loop — Why Token Costs Compound</h2>
+  <div class="slide-body">
+  <div class="two-col-3-2" style="margin-top:0.4em; align-items:center;">
+    <div>
+      <!-- Agent loop SVG: horizontal layout User → [loop] → Output -->
+      <svg viewBox="0 0 520 200" width="100%" style="display:block;">
+        <defs>
+          <marker id="arrowB" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#58a6ff"/>
+          </marker>
+          <marker id="arrowY" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#e3b341"/>
+          </marker>
+          <marker id="arrowG" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#3fb950"/>
+          </marker>
+        </defs>
+
+        <!-- User box -->
+        <rect x="4" y="82" width="68" height="36" rx="6" fill="#21262d" stroke="#30363d" stroke-width="1.5"/>
+        <text x="38" y="97" font-family="Inter,sans-serif" font-size="10" fill="#e6edf3" text-anchor="middle" font-weight="600">User</text>
+        <text x="38" y="110" font-family="Inter,sans-serif" font-size="8.5" fill="#8b949e" text-anchor="middle">message</text>
+
+        <!-- Arrow: User → loop -->
+        <line x1="72" y1="100" x2="100" y2="100" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arrowB)"/>
+
+        <!-- Agent Loop bounding box -->
+        <rect x="102" y="20" width="296" height="160" rx="10" fill="rgba(88,166,255,0.05)" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="6,3"/>
+        <text x="250" y="14" font-family="Inter,sans-serif" font-size="9" fill="#58a6ff" text-anchor="middle" font-weight="600" letter-spacing="1">AGENT LOOP</text>
+
+        <!-- LLM Call box -->
+        <rect x="118" y="68" width="80" height="34" rx="6" fill="#1a2332" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="158" y="83" font-family="Inter,sans-serif" font-size="9.5" fill="#58a6ff" text-anchor="middle" font-weight="600">LLM Call</text>
+        <text x="158" y="95" font-family="Inter,sans-serif" font-size="8" fill="#f78166" text-anchor="middle">ctx grows ↑↑</text>
+
+        <!-- Arrow: LLM → Tool Call -->
+        <line x1="198" y1="85" x2="224" y2="85" stroke="#e3b341" stroke-width="1.5" marker-end="url(#arrowY)"/>
+
+        <!-- Tool Call box -->
+        <rect x="226" y="68" width="72" height="34" rx="6" fill="#21262d" stroke="#e3b341" stroke-width="1.5"/>
+        <text x="262" y="83" font-family="Inter,sans-serif" font-size="9.5" fill="#e3b341" text-anchor="middle" font-weight="600">Tool Call</text>
+        <text x="262" y="95" font-family="Inter,sans-serif" font-size="8" fill="#8b949e" text-anchor="middle">+result appended</text>
+
+        <!-- Arrow: Tool → Tool Result (goes down, around, back) -->
+        <line x1="298" y1="85" x2="320" y2="85" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrowG)"/>
+
+        <!-- Tool Result box -->
+        <rect x="322" y="68" width="62" height="34" rx="6" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="353" y="83" font-family="Inter,sans-serif" font-size="9.5" fill="#3fb950" text-anchor="middle" font-weight="600">Result</text>
+        <text x="353" y="95" font-family="Inter,sans-serif" font-size="8" fill="#8b949e" text-anchor="middle">in context</text>
+
+        <!-- Loop-back arrow (bottom arc: Result → LLM) -->
+        <path d="M353,102 Q353,140 262,140 Q180,140 158,140 L158,102" stroke="#58a6ff" stroke-width="1.5" fill="none" marker-end="url(#arrowB)" stroke-dasharray="5,3"/>
+        <text x="260" y="155" font-family="Inter,sans-serif" font-size="8.5" fill="#8b949e" text-anchor="middle">repeat until done</text>
+
+        <!-- Arrow: loop → Output -->
+        <line x1="398" y1="100" x2="424" y2="100" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrowG)"/>
+
+        <!-- Output terminator (stadium shape) -->
+        <rect x="426" y="82" width="86" height="36" rx="18" fill="rgba(63,185,80,0.12)" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="469" y="97" font-family="Inter,sans-serif" font-size="10" fill="#3fb950" text-anchor="middle" font-weight="600">Output</text>
+        <text x="469" y="110" font-family="Inter,sans-serif" font-size="8.5" fill="#8b949e" text-anchor="middle">done</text>
+      </svg>
+    </div>
+    <div>
+      <ul style="font-size:0.65em; line-height:1.8;">
+        <li>Each tool call result is <strong>appended</strong> to context</li>
+        <li>Each LLM call pays for the <strong>full context</strong> at that point</li>
+        <li>One user message → <strong>10, 20, 50+ LLM calls</strong></li>
+        <li>The agent decides how many — <em>not you</em></li>
+      </ul>
+      <blockquote style="margin-top:0.8em;">
+        "You are billed for the <strong>sum of all context windows</strong> across all turns — not the final context size."
+      </blockquote>
+      <p class="small">A session showing 1M input tokens doesn't mean 1M in context — it means a growing context was re-sent many times.</p>
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    The shaded area in the diagram represents the total billed tokens — the sum under the growing curve.
+    This is why sessions seem expensive: every turn pays for everything that came before it, again.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     SECTION 4 — CONTEXT WINDOW
+     ══════════════════════════════════════════════════════ -->
+
+<!-- SLIDE 7: What Goes Into Context -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 4 — Context Window: Your Most Expensive Resource</div>
+  <h2>What Goes Into Context</h2>
+  <div class="slide-body">
+  <div class="two-col" style="margin-top:0.5em; align-items:center;">
+    <div>
+      <!-- Tank filling SVG -->
+      <svg viewBox="0 0 200 300" width="360" style="display:block; margin:0 auto;">
+        <defs>
+          <linearGradient id="tankGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f78166" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#58a6ff" stop-opacity="0.7"/>
+          </linearGradient>
+        </defs>
+        <!-- Tank outline -->
+        <rect x="30" y="20" width="140" height="260" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+        <!-- Fill layers (bottom to top) -->
+        <!-- Layer 1: Conversation history (largest) -->
+        <rect x="32" y="165" width="136" height="113" rx="0" fill="rgba(247,129,102,0.55)"/>
+        <text x="100" y="196" font-family="Inter,sans-serif" font-size="9.5" fill="#fff" text-anchor="middle" font-weight="600">Conversation history</text>
+        <text x="100" y="209" font-family="Inter,sans-serif" font-size="8" fill="rgba(255,255,255,0.7)" text-anchor="middle">(all turns)</text>
+        <!-- Layer 2: Tool results -->
+        <rect x="32" y="127" width="136" height="38" rx="0" fill="rgba(227,179,65,0.65)"/>
+        <text x="100" y="150" font-family="Inter,sans-serif" font-size="9" fill="#fff" text-anchor="middle">Tool call results</text>
+        <!-- Layer 3: MCP tool definitions -->
+        <rect x="32" y="97" width="136" height="30" rx="0" fill="rgba(63,185,80,0.65)"/>
+        <text x="100" y="116" font-family="Inter,sans-serif" font-size="9" fill="#fff" text-anchor="middle">MCP tool definitions</text>
+        <!-- Layer 4: Skills -->
+        <rect x="32" y="73" width="136" height="24" rx="0" fill="rgba(88,166,255,0.65)"/>
+        <text x="100" y="89" font-family="Inter,sans-serif" font-size="9" fill="#fff" text-anchor="middle">Enabled skill definitions</text>
+        <!-- Layer 5: System prompt -->
+        <rect x="32" y="22" width="136" height="51" rx="6" fill="rgba(188,140,255,0.65)"/>
+        <text x="100" y="45" font-family="Inter,sans-serif" font-size="9.5" fill="#fff" text-anchor="middle" font-weight="600">System prompt</text>
+        <text x="100" y="58" font-family="Inter,sans-serif" font-size="8.5" fill="rgba(255,255,255,0.8)" text-anchor="middle">+ AGENTS.md</text>
+        <!-- Tank outline on top -->
+        <rect x="30" y="20" width="140" height="260" rx="8" fill="none" stroke="#30363d" stroke-width="2"/>
+        <!-- Overflow arrows -->
+        <text x="100" y="295" font-family="Inter,sans-serif" font-size="10" fill="#f78166" text-anchor="middle">↑ re-sent every LLM call</text>
+      </svg>
+    </div>
+    <div>
+      <ul style="font-size:0.68em; line-height:1.9;">
+        <li><span style="color:var(--purple)">■</span> System prompt + <span class="mono">AGENTS.md</span></li>
+        <li><span style="color:var(--blue)">■</span> Enabled skill definitions</li>
+        <li><span style="color:var(--green)">■</span> MCP tool definitions<br/><span class="small">(each MCP adds hundreds–thousands of tokens)</span></li>
+        <li><span style="color:var(--yellow)">■</span> Tool call results (raw output from every tool)</li>
+        <li><span style="color:var(--red)">■</span> Conversation history (all turns)</li>
+      </ul>
+      <div class="callout" style="margin-top:0.9em;">
+        <strong>All of this is re-sent with every single LLM call.</strong>
+      </div>
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    The context is not just your conversation. It is the system prompt, every enabled skill's definition,
+    every connected MCP's full tool schema, every tool result from every turn, and the entire conversation history.
+    Every time the model makes a decision, it pays to re-read all of this.
+  </aside>
+</section>
+
+<!-- SLIDE 8: Context Entropy -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 4 — Context Window: Your Most Expensive Resource</div>
+  <h2>Context Entropy</h2>
+  <div class="slide-body">
+  <div class="two-col" style="margin-top:0.6em;">
+    <div>
+      <ul style="font-size:0.7em; line-height:1.8;">
+        <li>Not just <em>quantity</em> — <strong>quality</strong> matters</li>
+        <li><strong style="color:var(--green)">Relevant, precise context</strong> → better decisions, fewer iterations</li>
+        <li><strong style="color:var(--red)">Polluted context</strong> (tool noise, irrelevant files, verbose outputs) → degrades reasoning</li>
+        <li>The model must find the signal in the noise — hurts analysis quality, decision quality, output quality</li>
+      </ul>
+    </div>
+    <div>
+      <div class="callout red">
+        <strong>Worst case: Prompt Injection</strong><br/>
+        Model encounters adversarial content in a file it reads — alters behavior. Any data in context has some effect on behavior.
+      </div>
+      <div class="callout" style="margin-top:0.7em;">
+        <strong>More subtle:</strong> Large noisy context → model favors the most capable (= most expensive) model just to cope.
+      </div>
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Context quality is as important as context size. Polluted context degrades reasoning quality — and the
+    natural response is to switch to a more capable model, which multiplies cost. Fixing context entropy
+    is the same as fixing model selection.
+  </aside>
+</section>
+
+<!-- SLIDE 9: Compaction -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 4 — Context Window: Your Most Expensive Resource</div>
+  <h2>Compaction: A Reasoning Event and a Cost Event</h2>
+  <div class="slide-body">
+  <div class="two-col" style="margin-top:0.4em; align-items:start;">
+    <div>
+      <p style="font-size:0.65em; color:var(--muted); margin:0 0 0.5em;">When context approaches the limit, the model summarizes and loses precision.</p>
+      <ul style="font-size:0.65em; line-height:1.8;">
+        <li>Model forgets verified facts → re-investigates → wastes tokens</li>
+        <li>Model loses prior decisions → conflicting assumptions → incorrect output</li>
+        <li>Long sessions with heavy compaction → <strong style="color:var(--red)">architectural drift</strong></li>
+      </ul>
+      <div class="callout" style="margin-top:0.6em; font-size:0.65em;">
+        <strong>Thesis (second of three):</strong><br/>
+        <em>"This is the clearest single illustration of quality and cost being the same engineering problem."</em>
+      </div>
+    </div>
+    <div>
+      <!-- Negative feedback loop SVG -->
+      <svg viewBox="0 0 240 240" width="67%" style="display:block; margin:0 auto;">
+        <defs>
+          <marker id="arrowR" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#f78166"/>
+          </marker>
+        </defs>
+        <!-- Central label -->
+        <circle cx="120" cy="120" r="36" fill="#2a1a1a" stroke="#f78166" stroke-width="2"/>
+        <text x="120" y="116" font-family="Inter,sans-serif" font-size="9.5" fill="#f78166" text-anchor="middle" font-weight="700">Reasoning</text>
+        <text x="120" y="129" font-family="Inter,sans-serif" font-size="9.5" fill="#f78166" text-anchor="middle" font-weight="700">Degradation</text>
+
+        <!-- Nodes -->
+        <!-- Top: Pollution -->
+        <rect x="80" y="4" width="80" height="26" rx="5" fill="#21262d" stroke="#e3b341" stroke-width="1.5"/>
+        <text x="120" y="21" font-family="Inter,sans-serif" font-size="9" fill="#e3b341" text-anchor="middle">Context Pollution</text>
+
+        <!-- Right: Early compaction -->
+        <rect x="182" y="95" width="54" height="36" rx="5" fill="#21262d" stroke="#f78166" stroke-width="1.5"/>
+        <text x="209" y="110" font-family="Inter,sans-serif" font-size="8.5" fill="#f78166" text-anchor="middle">Early</text>
+        <text x="209" y="122" font-family="Inter,sans-serif" font-size="8.5" fill="#f78166" text-anchor="middle">Compaction</text>
+
+        <!-- Bottom: Re-investigation -->
+        <rect x="72" y="208" width="96" height="26" rx="5" fill="#21262d" stroke="#8b949e" stroke-width="1.5"/>
+        <text x="120" y="225" font-family="Inter,sans-serif" font-size="9" fill="#8b949e" text-anchor="middle">Re-investigation</text>
+
+        <!-- Left: More pollution -->
+        <rect x="4" y="95" width="54" height="36" rx="5" fill="#21262d" stroke="#e3b341" stroke-width="1.5"/>
+        <text x="31" y="110" font-family="Inter,sans-serif" font-size="8.5" fill="#e3b341" text-anchor="middle">More</text>
+        <text x="31" y="122" font-family="Inter,sans-serif" font-size="8.5" fill="#e3b341" text-anchor="middle">Pollution</text>
+
+        <!-- Arrows (clockwise) -->
+        <!-- Top → Right -->
+        <path d="M160,17 Q200,17 200,95" stroke="#f78166" stroke-width="1.5" fill="none" marker-end="url(#arrowR)"/>
+        <!-- Right → Center (implied by degradation) -->
+        <line x1="182" y1="113" x2="156" y2="113" stroke="#f78166" stroke-width="1.5" marker-end="url(#arrowR)"/>
+        <!-- Center → Bottom -->
+        <line x1="120" y1="156" x2="120" y2="208" stroke="#f78166" stroke-width="1.5" marker-end="url(#arrowR)"/>
+        <!-- Bottom → Left -->
+        <path d="M72,221 Q40,221 40,131" stroke="#f78166" stroke-width="1.5" fill="none" marker-end="url(#arrowR)"/>
+        <!-- Left → Top -->
+        <path d="M40,95 Q40,17 80,17" stroke="#f78166" stroke-width="1.5" fill="none" marker-end="url(#arrowR)"/>
+      </svg>
+      <p class="small" style="text-align:center;">The negative feedback loop</p>
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Compaction is not primarily a cost problem. It is a reasoning quality problem. The model forgets what it
+    verified. It forgets the decisions it made. Then it reinvestigates — burning more tokens, often coming to
+    different conclusions. This is architectural drift. Engineers in the room will recognize it.
+    Qualifier: compaction doesn't deterministically ruin sessions — it increases the probability of degradation,
+    especially in large noisy contexts.
+  </aside>
+</section>
+
+<!-- SLIDE 10: Context Hygiene -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 4 — Context Window: Your Most Expensive Resource</div>
+  <h2>Best Practices — Context Hygiene <span class="demo-badge">Demo</span></h2>
+  <div class="slide-body">
+  <div class="two-col" style="margin-top:0.5em; gap:1.2em;">
+    <div class="panel">
+      <h4 style="color:var(--green)">Under Your Full Control</h4>
+      <ul>
+        <li>Adjust enabled <strong>skills</strong> to match current task</li>
+        <li>Adjust enabled <strong>MCPs</strong> — disable when not needed</li>
+        <li>Split large tasks into focused sessions (clean context each time)</li>
+        <li>Write precise first messages: exact file paths, line ranges, scope boundaries</li>
+        <li>Avoid <span class="mono">@</span>-including entire folders or large files</li>
+        <li>Prefer terse tools (<span class="mono">rg</span>, <span class="mono">jq</span>) over verbose equivalents</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h4 style="color:var(--yellow)">Mechanisms You Cannot Control</h4>
+      <ul>
+        <li>Model's internal memory writes<br/><span class="small">→ disable if possible; use explicit <span class="mono">memory.md</span></span></li>
+        <li>System prompt injections during agent loop</li>
+        <li>What gets preserved or lost during compaction</li>
+      </ul>
+      <div style="margin-top:0.7em; font-size:0.9em; color:var(--yellow);">
+        <strong>General principle:</strong> move away from under-the-hood magic toward predictability and control.
+      </div>
+    </div>
+  </div>
+  <p class="small" style="margin-top:0.6em;">Demo: show live how enabling/disabling a skill or MCP affects initial context token count.</p>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Live demo: open the tool and toggle a skill or MCP on/off. Show the token count change.
+    This makes the abstract concrete — these aren't invisible costs, they're observable and controllable.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     SECTION 5 — DEFAULT COPILOT WORKFLOW
+     ══════════════════════════════════════════════════════ -->
+
+<!-- SLIDE 11: Default Workflow -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 5 — Default Copilot Workflow</div>
+  <h2>Convenience Architecture <span class="demo-badge">Demo</span></h2>
+  <div class="slide-body">
+  <p style="font-size:0.65em; color:var(--muted); margin:0.2em 0 0.6em;">What default actually looks like</p>
+  <div class="two-col" style="gap:1.2em; align-items:start;">
+    <div>
+      <!-- Single agent diagram SVG -->
+      <svg viewBox="0 0 220 280" width="67%" style="display:block; margin:0 auto;">
+        <defs>
+          <marker id="arrW" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L7,3 z" fill="#8b949e"/>
+          </marker>
+        </defs>
+        <!-- Agent box -->
+        <rect x="40" y="60" width="140" height="50" rx="8" fill="#1a2332" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="110" y="82" font-family="Inter,sans-serif" font-size="11" fill="#58a6ff" text-anchor="middle" font-weight="700">Single Agent</text>
+        <text x="110" y="98" font-family="Inter,sans-serif" font-size="8.5" fill="#8b949e" text-anchor="middle">Opus 4.6 · All tools</text>
+
+        <!-- Inputs (top) -->
+        <rect x="10" y="5" width="60" height="22" rx="4" fill="#21262d" stroke="#bc8cff" stroke-width="1"/>
+        <text x="40" y="20" font-family="Inter,sans-serif" font-size="8" fill="#bc8cff" text-anchor="middle">All Skills</text>
+        <line x1="40" y1="27" x2="70" y2="60" stroke="#bc8cff" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrW)"/>
+
+        <rect x="80" y="5" width="60" height="22" rx="4" fill="#21262d" stroke="#e3b341" stroke-width="1"/>
+        <text x="110" y="20" font-family="Inter,sans-serif" font-size="8" fill="#e3b341" text-anchor="middle">All MCPs</text>
+        <line x1="110" y1="27" x2="110" y2="60" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrW)"/>
+
+        <rect x="150" y="5" width="60" height="22" rx="4" fill="#21262d" stroke="#f78166" stroke-width="1"/>
+        <text x="180" y="20" font-family="Inter,sans-serif" font-size="8" fill="#f78166" text-anchor="middle">All Tools</text>
+        <line x1="165" y1="27" x2="145" y2="60" stroke="#f78166" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrW)"/>
+
+        <!-- Outputs (bottom) -->
+        <line x1="110" y1="110" x2="110" y2="140" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arrW)"/>
+
+        <rect x="40" y="140" width="140" height="30" rx="6" fill="#21262d" stroke="#30363d" stroke-width="1"/>
+        <text x="110" y="159" font-family="Inter,sans-serif" font-size="9" fill="#e3b341" text-anchor="middle">Growing Context (single)</text>
+
+        <line x1="110" y1="170" x2="110" y2="196" stroke="#f78166" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arrW)"/>
+
+        <rect x="50" y="196" width="120" height="30" rx="6" fill="#2a1a1a" stroke="#f78166" stroke-width="1.5"/>
+        <text x="110" y="215" font-family="Inter,sans-serif" font-size="9.5" fill="#f78166" text-anchor="middle" font-weight="600">Context Overload</text>
+
+        <line x1="110" y1="226" x2="110" y2="252" stroke="#f78166" stroke-width="1.5" marker-end="url(#arrW)"/>
+        <rect x="60" y="252" width="100" height="24" rx="4" fill="#21262d" stroke="#f78166" stroke-width="1"/>
+        <text x="110" y="267" font-family="Inter,sans-serif" font-size="8.5" fill="#f78166" text-anchor="middle">Compaction</text>
+      </svg>
+    </div>
+    <div>
+      <ul style="font-size:0.66em; line-height:1.85;">
+        <li>Default is intentionally optimized for <strong>accessibility and onboarding</strong> — the right tradeoff for getting started</li>
+        <li>In practice: single agent, full skill set, all MCPs, all tools, one growing context</li>
+        <li>First user message → AGENTS.md, LODA files, referenced files/folders read → all lands in single context</li>
+        <li>Context is <strong>already significantly loaded</strong> before useful work begins</li>
+      </ul>
+      <div class="callout red" style="margin-top:0.8em;">
+        Under-the-hood additions you don't see: initial agent system prompt (not user-configurable), injected guidance during agent loop.
+      </div>
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Demo: show actual default settings — enabled skills, enabled MCPs, tool list.
+    The default workflow isn't badly designed. It's designed for a different goal: onboarding and accessibility.
+    For teams at scale, the tradeoffs shift.
+  </aside>
+</section>
+
+<!-- SLIDE 12: Where Token Spend Escapes Control -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 5 — Default Copilot Workflow</div>
+  <h2>Where Token Spend Escapes Your Control</h2>
+  <div class="slide-body">
+  <div class="callout red" style="margin-bottom:0.8em; font-size:0.68em;">
+    Once you send a message: the agent loop runs. You observe. You cannot steer mid-flight effectively.<br/>
+    <strong>Best strategy: press Esc immediately if you see the agent doing something wrong. Stop the loop. Write a more precise prompt. Restart.</strong>
+  </div>
+  <table>
+    <thead><tr><th>Uncontrolled Behavior</th><th>Your Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td>Number of tool calls</td><td>Limit tool visibility via MCP / primitive tool whitelisting</td></tr>
+      <tr><td>Agent loop iterations</td><td>Write tighter scoped prompts; cancel early</td></tr>
+      <tr><td>Internal memory writes</td><td>Disable; use explicit <span class="mono">memory.md</span> instead</td></tr>
+      <tr><td>Compaction timing</td><td>Reduce context size so compaction is rare</td></tr>
+    </tbody>
+  </table>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    The agent loop runs faster than you can type a steering message. By the time you intervene, the agent
+    may be done — or deep in the wrong direction with tokens already burned.
+    The most powerful intervention is: Esc, then a better prompt.
+  </aside>
+</section>
+
+<!-- SLIDE 13: Why This Pushes Toward Expensive Models -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 5 — Default Copilot Workflow</div>
+  <h2>Why This Pushes You Toward Expensive Models</h2>
+  <div class="slide-body">
+  <!-- Causal chain -->
+  <div style="display:flex; align-items:center; gap:0.5em; margin:0.6em 0; font-size:0.65em; flex-wrap:wrap;">
+    <div class="panel" style="flex:1; text-align:center; padding:0.7em;">
+      <div style="color:var(--red); font-size:1.1em;">Large noisy<br/>context</div>
+    </div>
+    <div style="color:var(--muted); font-size:1.4em;">→</div>
+    <div class="panel" style="flex:1; text-align:center; padding:0.7em;">
+      <div style="color:var(--yellow);">Small/cheap models<br/>struggle with quality</div>
+    </div>
+    <div style="color:var(--muted); font-size:1.4em;">→</div>
+    <div class="panel" style="flex:1; text-align:center; padding:0.7em;">
+      <div style="color:var(--red);">Teams select<br/>most capable model</div>
+    </div>
+    <div style="color:var(--muted); font-size:1.4em;">→</div>
+    <div class="panel" style="flex:1; text-align:center; padding:0.7em; border-color:var(--red);">
+      <div style="color:var(--red); font-weight:700;">Cost multiplied</div>
+    </div>
+  </div>
+  <div class="callout green">
+    The real root cause is <strong>context entropy</strong>, not model capability.<br/>
+    <strong>Fix the context — and you can use cheaper models effectively.</strong>
+  </div>
+  <p style="font-size:0.65em; color:var(--muted); margin-top:0.7em;">
+    Transition: what can we control right now, without changing the architecture?
+  </p>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    This is the expensive trap. The problem isn't that your model is underpowered. The problem is that
+    the context is too noisy for the model to reason well. Fixing context entropy is cheaper and more
+    effective than upgrading models.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     SECTION 6 — OBSERVABILITY
+     ══════════════════════════════════════════════════════ -->
+
+<!-- SLIDE 14: The Observability Gap -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 6 — Observability</div>
+  <h2>The Observability Gap</h2>
+  <div class="slide-body">
+  <div class="two-col" style="margin-top:0.6em; gap:1.4em;">
+    <div class="panel">
+      <h4 style="color:var(--green)">What You See</h4>
+      <ul>
+        <li>Conversation turns</li>
+        <li>Final answers</li>
+        <li>Tool call names (sometimes)</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h4 style="color:var(--red)">What You Don't See</h4>
+      <ul>
+        <li>Token counts per turn</li>
+        <li>Full tool call chain</li>
+        <li>Model switches</li>
+        <li>Compaction events</li>
+        <li>Cost breakdown</li>
+        <li>Subagent activity, prompts, answers</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout red" style="margin-top:0.8em;">
+    <strong>You cannot improve what you cannot observe.</strong><br/>
+    You cannot standardize workflows across a team if sessions are invisible.<br/>
+    This is not a nice-to-have. It is a prerequisite for treating AI agent usage as a repeatable, improvable engineering practice.
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    GitHub Copilot CLI is designed for easy onboarding — great UX, limited visibility.
+    Without session telemetry, you have no way to know if a session was efficient, where it struggled,
+    or what to change next time.
+  </aside>
+</section>
+
+<!-- SLIDE 15: Bridging the Gap -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 6 — Observability</div>
+  <h2>Bridging the Gap <span class="demo-badge">Demo</span></h2>
+  <div class="slide-body">
+  <p style="font-size:0.63em; color:var(--muted); margin:0.2em 0 0.5em;">Custom session analysis scripts built on raw <span class="mono">events.jsonl</span> telemetry</p>
+  <div class="two-col" style="gap:1.2em;">
+    <div>
+      <div class="panel">
+        <h4>What the Scripts Reveal</h4>
+        <ul>
+          <li>Per-model token breakdown</li>
+          <li>Subagent dispatch: which agent, which model, tokens, tool calls, full prompt + answer</li>
+          <li>Compaction events: when, how many tokens lost</li>
+          <li>Tool usage: which tools, call count, success rate, latency</li>
+          <li>Timeline: exact sequence of everything</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div style="background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:0.7em; font-family:'JetBrains Mono',monospace; font-size:0.48em; color:var(--green); line-height:1.55; max-height:22em; overflow:hidden;">
+        <div style="color:var(--muted); margin-bottom:0.4em;">$ dotnet script analyze-events.csx</div>
+        <div style="color:var(--blue); font-weight:700; margin-bottom:0.2em;">══ Tool Usage Statistics ══</div>
+        <div>Bash        <span style="color:var(--yellow)">47 calls</span>  · ok:45  fail:2  · avg <span style="color:var(--green)">340ms</span></div>
+        <div>Read        <span style="color:var(--yellow)">38 calls</span>  · ok:38  fail:0  · avg <span style="color:var(--green)">12ms</span></div>
+        <div>Grep        <span style="color:var(--yellow)">21 calls</span>  · ok:21  fail:0  · avg <span style="color:var(--green)">28ms</span></div>
+        <div style="color:var(--blue); font-weight:700; margin:0.5em 0 0.2em;">══ Errors &amp; Warnings ══</div>
+        <div style="color:var(--red)">WARN  [turn 14] Compaction triggered — 91K → 22K tokens. 2 decisions lost.</div>
+        <div style="color:var(--yellow)">WARN  [turn 22] Tool result &gt;12K tokens returned to orchestrator context</div>
+        <div style="color:var(--blue); font-weight:700; margin:0.5em 0 0.2em;">══ Token &amp; Cost Table ══</div>
+        <div><span style="color:var(--purple)">opus-4.6  </span> in:<span style="color:var(--blue)">977K</span>  cache:<span style="color:var(--green)">977K</span>  out:<span style="color:var(--red)">14K</span></div>
+        <div><span style="color:var(--green)">haiku-4.5 </span> in:<span style="color:var(--blue)">3.2M</span>  cache:<span style="color:var(--green)">3.2M</span>  out:<span style="color:var(--red)">14K</span></div>
+        <div style="color:var(--blue); font-weight:700; margin:0.5em 0 0.2em;">══ Event Timeline (grouped by agent) ══</div>
+        <div><span style="color:var(--purple)">[1brainstorm]</span> t+0s   LLM call  opus-4.6    ctx:14K</div>
+        <div><span style="color:var(--green)">[sub-explorer]</span> t+4s  tool:Glob  haiku-4.5  14 results</div>
+        <div><span style="color:var(--green)">[sub-explorer]</span> t+6s  tool:Read  haiku-4.5  3.2K tokens</div>
+        <div><span style="color:var(--purple)">[1brainstorm]</span> t+9s   LLM call  opus-4.6   ctx:28K ↑</div>
+        <div style="color:var(--muted)">  … 47 more events …</div>
+        <div style="color:var(--blue); font-weight:700; margin:0.5em 0 0.2em;">══ Subagent Dispatches ══</div>
+        <div><span style="color:var(--green)">[sub-researcher · haiku-4.5]</span>  14 tool calls · 340K tokens</div>
+        <div style="color:var(--muted); padding-left:1em;">prompt: "Find all usages of IAuthService in the solution..."</div>
+        <div style="color:var(--green); padding-left:1em;">response: "Found 7 usages across 4 files. Primary: AuthController:142..."</div>
+      </div>
+      <div class="callout blue" style="margin-top:0.6em; font-size:0.65em;">
+        <strong>Every recommendation in this presentation is verifiable with these scripts on my own sessions.</strong>
+      </div>
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Demo: run analyze-events.csx on the example session. Show the output. Briefly show export-events.csx JSON structure.
+    The key message: this data is available to everyone. Not just workflow builders.
+    Any engineer can run this on their session and learn from it.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     SECTION 7 — FIVE CHANGES
+     ══════════════════════════════════════════════════════ -->
+
+<!-- SLIDE 16: Five Changes -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 7 — Five Changes You Can Make Tomorrow</div>
+  <h2>Five Changes You Can Make Tomorrow</h2>
+  <div class="slide-body">
+  <div style="margin-top:0.4em;">
+    <div style="display:flex; flex-direction:column; gap:0.4em;">
+      <div style="display:flex; align-items:center; gap:0.7em; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:0.45em 0.9em;">
+        <span style="font-size:1.4em; font-weight:800; color:var(--blue); min-width:1.2em;">1</span>
+        <span style="font-size:0.65em;">Disable MCPs not relevant to your current task</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.7em; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:0.45em 0.9em;">
+        <span style="font-size:1.4em; font-weight:800; color:var(--blue); min-width:1.2em;">2</span>
+        <span style="font-size:0.65em;">Disable skills not relevant to your current task</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.7em; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:0.45em 0.9em;">
+        <span style="font-size:1.4em; font-weight:800; color:var(--blue); min-width:1.2em;">3</span>
+        <span style="font-size:0.65em;">Scope your first message: exact file, exact function, exact scope — not <em>"look at my project"</em></span>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.7em; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:0.45em 0.9em;">
+        <span style="font-size:1.4em; font-weight:800; color:var(--blue); min-width:1.2em;">4</span>
+        <span style="font-size:0.65em;">One session = one task. Split anything bigger.</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.7em; background:var(--bg2); border:1px solid var(--red); border-radius:8px; padding:0.45em 0.9em;">
+        <span style="font-size:1.4em; font-weight:800; color:var(--red); min-width:1.2em;">5</span>
+        <span style="font-size:0.65em;"><strong>Cancel immediately</strong> if the agent goes the wrong direction — every wrong-direction tool call is already billed</span>
+      </div>
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    These five changes require no infrastructure, no tooling changes, no approvals.
+    Any developer on the team can apply all five starting today.
+    The cost impact is immediate and measurable.
+  </aside>
+</section>
+
+<!-- SLIDE 17: Prompt Quality Multiplier -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 7 — Five Changes You Can Make Tomorrow</div>
+  <h2>The Prompt Quality Multiplier</h2>
+  <div class="slide-body">
+  <div class="callout blue" style="margin-bottom:0.8em;">
+    A precise, well-scoped prompt is the single highest-ROI action.<br/>
+    It narrows the research surface → fewer tool calls → less context pollution → fewer iterations → <strong>lower cost + better output</strong>
+  </div>
+  <div class="two-col" style="gap:1.2em; margin-top:0.5em;">
+    <div class="panel" style="border-color:var(--red);">
+      <h4 style="color:var(--red)">Bad Prompt</h4>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:0.62em; color:var(--muted); background:var(--bg); padding:0.6em; border-radius:6px; margin-top:0.3em;">
+        "Help me fix the authentication module"
+      </div>
+      <ul style="margin-top:0.5em;">
+        <li>Triggers wide codebase exploration</li>
+        <li>Agent decides scope autonomously</li>
+        <li>Many tool calls, noisy context</li>
+      </ul>
+    </div>
+    <div class="panel" style="border-color:var(--green);">
+      <h4 style="color:var(--green)">Good Prompt</h4>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:0.6em; color:var(--green); background:var(--bg); padding:0.7em; border-radius:6px; margin-top:0.4em; line-height:1.6;">
+        "The JWT token expiry check in<br/>
+        <span style="color:var(--blue)">AuthService.cs:142</span> is returning false<br/>
+        for valid tokens when clock skew<br/>
+        exceeds 5 minutes. Fix only this function.<br/>
+        Token format: <span style="color:var(--blue)">TokenClaims.cs:28</span>"
+      </div>
+      <ul style="margin-top:0.5em;">
+        <li>Exact file + line references</li>
+        <li>Explicit scope boundary</li>
+        <li>Minimal tool calls needed</li>
+      </ul>
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    The good prompt eliminates the exploration phase entirely. The agent doesn't need to discover what
+    to look at — you've told it exactly. Every token spent on exploration is a token you paid for and
+    that adds noise to the context.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     SECTION 8 — TIERED AGENT MODEL
+     ══════════════════════════════════════════════════════ -->
+
+<!-- SLIDE 18: Army General Analogy -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 8 — Better Architecture: The Tiered Agent Model</div>
+  <h2>The Army General Analogy</h2>
+  <div class="slide-body">
+  <!-- Hierarchy SVG: General at top, 4 specialists in a row below, bidirectional arrows -->
+  <svg viewBox="0 0 560 220" width="100%" style="display:block; margin:0.6em 0;">
+
+    <!-- General box (top centre) -->
+    <rect x="162" y="10" width="236" height="48" rx="8" fill="rgba(188,140,255,0.15)" stroke="#bc8cff" stroke-width="2"/>
+    <text x="280" y="30" font-family="Inter,sans-serif" font-size="11" fill="#bc8cff" text-anchor="middle" font-weight="700">🎖️  General (Orchestrator)</text>
+    <text x="280" y="48" font-family="Inter,sans-serif" font-size="9" fill="#8b949e" text-anchor="middle">Reasons · Decides · Never touches raw data</text>
+
+    <!-- Fan-out lines: General bottom-centre → each specialist top-centre -->
+    <line x1="280" y1="58" x2="70"  y2="128" stroke="#8b949e" stroke-width="1.3"/>
+    <line x1="280" y1="58" x2="210" y2="128" stroke="#8b949e" stroke-width="1.3"/>
+    <line x1="280" y1="58" x2="350" y2="128" stroke="#8b949e" stroke-width="1.3"/>
+    <line x1="280" y1="58" x2="490" y2="128" stroke="#8b949e" stroke-width="1.3"/>
+
+    <!-- Specialist boxes (single row) -->
+    <!-- Scouts -->
+    <rect x="10" y="128" width="120" height="44" rx="7" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+    <text x="70" y="148" font-family="Inter,sans-serif" font-size="11" fill="#58a6ff" text-anchor="middle">🔍 Scouts</text>
+    <text x="70" y="163" font-family="Inter,sans-serif" font-size="8" fill="#8b949e" text-anchor="middle">explore · gather intel</text>
+
+    <!-- Suppliers -->
+    <rect x="150" y="128" width="120" height="44" rx="7" fill="#161b22" stroke="#e3b341" stroke-width="1.5"/>
+    <text x="210" y="148" font-family="Inter,sans-serif" font-size="11" fill="#e3b341" text-anchor="middle">📦 Suppliers</text>
+    <text x="210" y="163" font-family="Inter,sans-serif" font-size="8" fill="#8b949e" text-anchor="middle">fetch · retrieve data</text>
+
+    <!-- Medics -->
+    <rect x="290" y="128" width="120" height="44" rx="7" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+    <text x="350" y="148" font-family="Inter,sans-serif" font-size="11" fill="#3fb950" text-anchor="middle">🏥 Medics</text>
+    <text x="350" y="163" font-family="Inter,sans-serif" font-size="8" fill="#8b949e" text-anchor="middle">debug · fix · verify</text>
+
+    <!-- Other -->
+    <rect x="430" y="128" width="120" height="44" rx="7" fill="#161b22" stroke="#8b949e" stroke-width="1.5"/>
+    <text x="490" y="148" font-family="Inter,sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">⚙️ Other</text>
+    <text x="490" y="163" font-family="Inter,sans-serif" font-size="8" fill="#8b949e" text-anchor="middle">domain-specific tasks</text>
+
+    <!-- Raw data stays below label -->
+    <text x="280" y="196" font-family="Inter,sans-serif" font-size="8.5" fill="#f78166" text-anchor="middle">Raw data · Tool results · Noise — stays here, never crosses up</text>
+  </svg>
+  <div class="callout green" style="font-size:0.62em; margin-top:0.2em;">
+    The general's judgment is valuable precisely because it isn't spent crawling through bushes. Protect the orchestrator's attention budget the same way.
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    The general analogy maps cleanly to the technical architecture.
+    The key insight: the general's judgment is valuable precisely because it isn't spent crawling through bushes.
+    Protect the orchestrator's attention budget the same way.
+  </aside>
+</section>
+
+<!-- SLIDE 19: The Topology -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 8 — Better Architecture: The Tiered Agent Model</div>
+  <h2>The Topology <span class="demo-badge">Demo</span></h2>
+  <div class="slide-body">
+  <!-- Topology SVG: Tier1 + Tier2 side-by-side, quarantine line, Tier3 full-width below -->
+  <svg viewBox="0 0 580 275" width="100%" style="display:block; margin:0.5em 0;">
+
+    <!-- Tier 1 box (left) -->
+    <rect x="10" y="10" width="220" height="56" rx="8" fill="rgba(188,140,255,0.12)" stroke="#bc8cff" stroke-width="1.8"/>
+    <text x="120" y="32" font-family="Inter,sans-serif" font-size="10" fill="#bc8cff" text-anchor="middle" font-weight="700">Tier 1 — Reasoning</text>
+    <text x="120" y="48" font-family="Inter,sans-serif" font-size="9" fill="#8b949e" text-anchor="middle">1brainstorm · opus-4.6</text>
+    <text x="18" y="22" font-family="Inter,sans-serif" font-size="8" fill="#bc8cff" text-anchor="start">OPUS</text>
+
+    <!-- Arrow Tier1 → Tier2 (horizontal, no label) -->
+    <line x1="230" y1="38" x2="276" y2="38" stroke="#8b949e" stroke-width="1.5"/>
+
+    <!-- Tier 2 box (right) -->
+    <rect x="278" y="10" width="292" height="56" rx="8" fill="rgba(88,166,255,0.10)" stroke="#58a6ff" stroke-width="1.8"/>
+    <text x="424" y="32" font-family="Inter,sans-serif" font-size="10" fill="#58a6ff" text-anchor="middle" font-weight="700">Tier 2 — Execution</text>
+    <text x="370" y="48" font-family="Inter,sans-serif" font-size="9" fill="#8b949e" text-anchor="middle">2plan</text>
+    <text x="478" y="48" font-family="Inter,sans-serif" font-size="9" fill="#8b949e" text-anchor="middle">3build</text>
+    <text x="286" y="22" font-family="Inter,sans-serif" font-size="8" fill="#58a6ff" text-anchor="start">SONNET</text>
+
+    <!-- Lines from Tier1 and Tier2 down to Tier3 (plain lines, no arrowheads) -->
+    <line x1="120" y1="66" x2="120" y2="130" stroke="#8b949e" stroke-width="1.3"/>
+    <line x1="424" y1="66" x2="424" y2="130" stroke="#8b949e" stroke-width="1.3"/>
+
+    <!-- Quarantine boundary dashed line -->
+    <line x1="4" y1="118" x2="576" y2="118" stroke="#f78166" stroke-width="1.5" stroke-dasharray="7,3"/>
+    <text x="290" y="113" font-family="Inter,sans-serif" font-size="8.5" fill="#f78166" text-anchor="middle" font-weight="600">— Context Quarantine — dirty context does not cross this line —</text>
+
+    <!-- Tier 3 box (full width below quarantine, taller to contain Haiku label) -->
+    <rect x="4" y="130" width="572" height="120" rx="8" fill="rgba(63,185,80,0.07)" stroke="#3fb950" stroke-width="1.5"/>
+    <text x="290" y="150" font-family="Inter,sans-serif" font-size="10" fill="#3fb950" text-anchor="middle" font-weight="700">Tier 3 — Workers / Context Quarantine Zone (haiku-4.5)</text>
+
+    <!-- Worker agent boxes in row -->
+    <rect x="16" y="158" width="120" height="24" rx="4" fill="#161b22" stroke="#3fb950" stroke-width="1"/>
+    <text x="76" y="174" font-family="Inter,sans-serif" font-size="8.5" fill="#3fb950" text-anchor="middle">sub-explorer</text>
+
+    <rect x="148" y="158" width="130" height="24" rx="4" fill="#161b22" stroke="#3fb950" stroke-width="1"/>
+    <text x="213" y="174" font-family="Inter,sans-serif" font-size="8.5" fill="#3fb950" text-anchor="middle">sub-researcher</text>
+
+    <rect x="290" y="158" width="120" height="24" rx="4" fill="#161b22" stroke="#3fb950" stroke-width="1"/>
+    <text x="350" y="174" font-family="Inter,sans-serif" font-size="8.5" fill="#3fb950" text-anchor="middle">sub-reviewer</text>
+
+    <rect x="422" y="158" width="120" height="24" rx="4" fill="#161b22" stroke="#3fb950" stroke-width="1"/>
+    <text x="482" y="174" font-family="Inter,sans-serif" font-size="8.5" fill="#3fb950" text-anchor="middle">sub-debugger</text>
+
+    <text x="290" y="200" font-family="Inter,sans-serif" font-size="8.5" fill="#8b949e" text-anchor="middle">All tool calls · MCP queries · raw file reads → return condensed findings only</text>
+
+    <!-- Haiku savings label (inside Tier3 frame) -->
+    <rect x="180" y="213" width="220" height="18" rx="4" fill="rgba(63,185,80,0.15)"/>
+    <text x="290" y="226" font-family="Inter,sans-serif" font-size="8.5" fill="#3fb950" text-anchor="middle" font-weight="600">Haiku ~5× cheaper per token than Opus</text>
+  </svg>
+  <div class="callout green" style="font-size:0.62em; margin-top:0.2em;">
+    The orchestrator is smarter not because the model changed — because its <strong>attention budget is protected</strong>.
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Demo: show actual agent files — 1brainstorm, 2plan, 3build, sub-* — explain model assignments.
+    Show the permissions config: which tools each tier can access.
+    The quarantine line is the most important visual: nothing raw crosses it.
+  </aside>
+</section>
+
+<!-- SLIDE 20: Why Tiered Agents -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 8 — Better Architecture: The Tiered Agent Model</div>
+  <h2>Why Tiered Agents Reduce Cost and Improve Reasoning</h2>
+  <div class="slide-body">
+  <div class="two-col" style="gap:1em; margin-top:0.4em; align-items:start;">
+    <div>
+      <div class="callout blue" style="margin-bottom:0.5em; font-size:0.64em;">
+        The most important architectural value of subagents in this workflow is not parallelism.<br/>
+        It is <strong>context isolation</strong>.
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.28em; font-size:0.6em;">
+        <div style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:0.4em 0.7em;">
+          Context isolation
+        </div>
+        <div style="padding-left:1.5em; color:var(--muted)">↓</div>
+        <div style="background:var(--bg2); border:1px solid var(--blue); border-radius:6px; padding:0.4em 0.7em; color:var(--blue);">
+          Clean orchestrator context
+        </div>
+        <div style="padding-left:1.5em; color:var(--muted)">↓</div>
+        <div style="background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:0.4em 0.7em;">
+          Protected attention budget
+        </div>
+        <div style="padding-left:1.5em; color:var(--muted)">↓</div>
+        <div style="background:var(--bg2); border:1px solid var(--green); border-radius:6px; padding:0.4em 0.7em; color:var(--green);">
+          Better reasoning
+        </div>
+        <div style="padding-left:1.5em; color:var(--muted)">↓</div>
+        <div style="background:var(--bg2); border:1px solid var(--green); border-radius:6px; padding:0.4em 0.7em; color:var(--green);">
+          Fewer iterations → Lower cost
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="callout green" style="font-size:0.64em; margin-bottom:0.5em;">
+        This is not the same quality at lower cost.<br/>
+        It is <strong>better quality</strong>, because the orchestrator's attention is not diluted by raw noise.
+      </div>
+      <div class="panel" style="font-size:0.9em;">
+        <h4>Two Supporting Rules</h4>
+        <ul>
+          <li><strong>Expensive models</strong> work only with clean, distilled context</li>
+          <li><strong>Dirty work</strong> — tool calls, raw data, external lookups — goes to cheap fast models</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    The session data from Section 9 shows $11 of real work. Here is the architectural reason it was not $50.
+    Context isolation is the mechanism. The orchestrator never sees raw tool output — it only sees what
+    subagents chose to report back, in condensed form.
+  </aside>
+</section>
+
+<!-- SLIDE 21: Persistent Working Memory -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 8 — Better Architecture: The Tiered Agent Model</div>
+  <h2>Persistent Working Memory</h2>
+  <div class="slide-body">
+  <div class="two-col" style="gap:1.2em; margin-top:0.5em;">
+    <div>
+      <div class="panel" style="margin-bottom:0.6em;">
+        <h4>memory.md Structure</h4>
+        <ul style="font-size:0.9em;">
+          <li>Confirmed Facts</li>
+          <li>Active Assumptions</li>
+          <li>Open Questions</li>
+          <li>Decisions Made</li>
+          <li>Session Reasoning Log</li>
+        </ul>
+      </div>
+      <div class="callout green" style="font-size:0.65em;">
+        Survives compaction — it's a file, not context.
+        You can read it, edit it, share it, use it as a handoff document.
+      </div>
+    </div>
+    <div>
+      <div class="panel" style="margin-bottom:0.6em;">
+        <h4 style="color:var(--yellow)">vs. Built-in Memory</h4>
+        <ul style="font-size:0.9em;">
+          <li style="color:var(--red)">You can't see it</li>
+          <li style="color:var(--red)">You can't edit it</li>
+          <li style="color:var(--red)">You don't control what gets written</li>
+        </ul>
+      </div>
+      <div class="callout green" style="font-size:0.62em;">
+        Stable, reusable context → prompt cache activates automatically every turn.<br/>
+        <strong>Cache savings are a byproduct of good architecture, not a separate optimization.</strong>
+      </div>
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Cache utilization is not a separate optimization. It is a byproduct of architecture with stable, reusable context.
+    Because the system prompt and memory.md are re-read every turn, Anthropic's prompt cache activates automatically.
+    This saved $7.26 in a single session — 39% of total cost.
+  </aside>
+</section>
+
+<!-- SLIDE 22: Convenience → Production Architecture -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 8 — Better Architecture: The Tiered Agent Model</div>
+  <h2>Convenience Architecture → Production Architecture</h2>
+  <div class="slide-body">
+  <p style="font-size:0.6em; color:var(--muted); margin:0.2em 0 0.6em;">Every item on the right addresses a specific cost and reasoning quality failure covered in this presentation.</p>
+  <table style="font-size:1.12em;">
+    <thead>
+      <tr>
+        <th style="color:var(--red)">Convenience Architecture</th>
+        <th style="color:var(--green)">Production Architecture</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="color:var(--muted)">Single agent</td>
+        <td style="color:var(--green)">Tiered orchestration</td>
+      </tr>
+      <tr>
+        <td style="color:var(--muted)">All skills visible</td>
+        <td style="color:var(--green)">Task-scoped skills</td>
+      </tr>
+      <tr>
+        <td style="color:var(--muted)">All MCPs active</td>
+        <td style="color:var(--green)">Task-scoped MCPs</td>
+      </tr>
+      <tr>
+        <td style="color:var(--muted)">All tools visible</td>
+        <td style="color:var(--green)">Scoped visible tools</td>
+      </tr>
+      <tr>
+        <td style="color:var(--muted)">Implicit context growth</td>
+        <td style="color:var(--green)">Explicit working memory (<span class="mono">memory.md</span>)</td>
+      </tr>
+      <tr>
+        <td style="color:var(--muted)">Optimized for: onboarding</td>
+        <td style="color:var(--green)">Optimized for: scale, cost, predictability</td>
+      </tr>
+    </tbody>
+  </table>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Each row in this table maps to a specific slide in this presentation.
+    This is not a list of nice-to-haves — it's a structured response to specific, measurable failure modes.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     SECTION 9 — COST COMPARISON
+     ══════════════════════════════════════════════════════ -->
+
+<!-- SLIDE 23: Three Scenarios -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 9 — Cost Comparison: Real Data</div>
+  <h2>Three Scenarios, Same Task</h2>
+  <div class="slide-body">
+  <table style="margin-top:0.4em;">
+    <thead>
+      <tr>
+        <th></th>
+        <th><span class="scenario-a">A — Tiered workflow</span></th>
+        <th><span class="scenario-b">B — All Opus, tiered</span></th>
+        <th><span class="scenario-c">C — Default single agent</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Architecture</strong></td>
+        <td>Orchestrator + 4 subagents</td>
+        <td>Same topology, same token volumes</td>
+        <td>Single agent, all tools/skills/MCPs</td>
+      </tr>
+      <tr>
+        <td><strong>Models</strong></td>
+        <td>Opus 4.6 + Haiku 4.5</td>
+        <td>Opus 4.6 only</td>
+        <td>Opus 4.6</td>
+      </tr>
+      <tr>
+        <td><strong>Evidence</strong></td>
+        <td>Measured telemetry, exact API repricing</td>
+        <td>Exact repricing of measured token volumes</td>
+        <td>Architectural behavior estimate*</td>
+      </tr>
+      <tr>
+        <td><strong>Est. Cost</strong></td>
+        <td><span class="scenario-a" style="font-size:1.15em; font-weight:700;">~$11</span></td>
+        <td><span class="scenario-b" style="font-size:1.15em; font-weight:700;">~$27.50</span></td>
+        <td><span class="scenario-c" style="font-size:1.15em; font-weight:700;">~$100–230*</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.6em; margin:0.7em 0;">
+    <div class="callout green" style="font-size:0.6em; text-align:center;">
+      <strong>A vs. B: 2.5×</strong><br/>The model routing dividend.<br/>Exact &amp; reproducible.
+    </div>
+    <div class="callout" style="font-size:0.6em; text-align:center;">
+      <strong>B vs. C: 4–8×</strong><br/>The isolation dividend.<br/>Architectural estimate.
+    </div>
+    <div class="callout red" style="font-size:0.6em; text-align:center;">
+      <strong>A vs. C: 9–21×</strong><br/>Combined effect.<br/>Model routing + isolation.
+    </div>
+  </div>
+  <div class="callout green" style="font-size:0.58em;">
+    <strong>Cache savings (Scenario A, measured):</strong>
+    Opus cache reads: 977,749 × $4.50/M = $4.40 saved ·
+    Haiku cache reads: 3,176,855 × $0.90/M = $2.86 saved ·
+    <strong>Total: ~$7.26 (~39% of session cost)</strong>
+  </div>
+  <p class="small" style="margin-top:0.3em;">*Scenario C range is wide by design. Default single-agent architecture does not produce stable or predictable token growth. Anthropic API pricing, May 2026.</p>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    A vs B is exact — same measured token volumes, only model changed. This is reproducible.
+    B vs C is an architectural estimate. The range is intentionally wide because default single-agent
+    architecture produces non-linear, unpredictable token growth due to compaction feedback loops.
+    The width reflects genuine unpredictability, not analytical uncertainty.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     SECTION 10 — WHAT'S NEXT
+     ══════════════════════════════════════════════════════ -->
+
+<!-- SLIDE 24: A Tested Workflow -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 10 — What's Next</div>
+  <h2>A Tested Workflow. Ready to Extend.</h2>
+  <div class="slide-body">
+  <p style="font-size:0.7em; color:var(--muted); margin:0.3em 0 0.8em;">This is a tested, production-validated starting point — not the final answer.</p>
+  <!-- Iteration cycle -->
+  <div style="display:flex; align-items:center; justify-content:center; gap:0.6em; margin:0.5em 0; flex-wrap:wrap;">
+    <div class="panel" style="text-align:center; padding:0.8em 1.2em; flex:1; min-width:100px;">
+      <div style="font-size:1.6em; margin-bottom:0.2em;">🔧</div>
+      <div style="font-size:0.7em; font-weight:600; color:var(--blue);">Change</div>
+    </div>
+    <div style="font-size:1.4em; color:var(--muted);">→</div>
+    <div class="panel" style="text-align:center; padding:0.8em 1.2em; flex:1; min-width:100px;">
+      <div style="font-size:1.6em; margin-bottom:0.2em;">🔬</div>
+      <div style="font-size:0.7em; font-weight:600; color:var(--blue);">Test &amp; Observe</div>
+      <div style="font-size:0.6em; color:var(--muted);">analyze-events.csx</div>
+    </div>
+    <div style="font-size:1.4em; color:var(--muted);">→</div>
+    <div class="panel" style="text-align:center; padding:0.8em 1.2em; flex:1; min-width:100px;">
+      <div style="font-size:1.6em; margin-bottom:0.2em;">📋</div>
+      <div style="font-size:0.7em; font-weight:600; color:var(--blue);">Analyze Gaps</div>
+    </div>
+    <div style="font-size:1.4em; color:var(--muted);">→</div>
+    <div class="panel" style="text-align:center; padding:0.8em 1.2em; flex:1; min-width:100px; border-color:var(--green);">
+      <div style="font-size:1.6em; margin-bottom:0.2em;">✅</div>
+      <div style="font-size:0.7em; font-weight:600; color:var(--green);">Apply &amp; Repeat</div>
+    </div>
+  </div>
+  <div class="callout blue">
+    It is open for contribution and improvement from the team.
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    The workflow is not frozen. It's a starting point with a feedback loop built in.
+    The analysis scripts make every iteration measurable. You can see whether a change improved or
+    worsened cost, reasoning quality, and compaction frequency.
+  </aside>
+</section>
+
+<!-- SLIDE 25: Future Directions -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 10 — What's Next</div>
+  <h2>Future Directions</h2>
+  <div class="slide-body">
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6em; margin-top:0.5em;">
+    <div class="panel">
+      <h4>More Specialized Agents</h4>
+      <ul>
+        <li>Bug triage workflow: exception in logs → root cause → team attribution → work item in ADO — one command, one output</li>
+        <li>Domain-specific orchestration patterns</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h4>Better Tooling</h4>
+      <ul>
+        <li>More LLM-friendly tools with terse output</li>
+        <li><span class="mono">export-events.csx</span>, <span class="mono">rg</span>, <span class="mono">jq</span></li>
+        <li>General-purpose tools that don't produce noise</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h4>Better Prompts</h4>
+      <ul>
+        <li>Refined orchestrator and subagent prompts</li>
+        <li>User-facing prompt templates for common task types</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h4>Team Shared Configuration</h4>
+      <ul>
+        <li>Shared agent definitions</li>
+        <li>Shared skills and MCP configurations</li>
+        <li>Don't let everyone reinvent this independently</li>
+      </ul>
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Each of these directions compounds the value already demonstrated.
+    Shared configuration in particular is high-leverage — one person's optimization becomes everyone's optimization.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     SECTION 11 — QUESTIONS
+     ══════════════════════════════════════════════════════ -->
+
+<!-- SLIDE 26: Questions -->
+<section data-background-color="#0d1117">
+  <div class="vcenter">
+  <div class="section-label">Section 11 — Questions</div>
+  <h2>Questions</h2>
+  <div class="slide-body">
+  <p style="font-size:0.65em; color:var(--muted); margin:0.1em 0 0.5em; font-weight:600; letter-spacing:0.04em;">Key takeaways</p>
+  <div style="margin-top:0.2em;">
+    <div style="display:flex; flex-direction:column; gap:0.45em;">
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:0.5em 0.9em; display:flex; gap:0.7em; align-items:flex-start;">
+        <span style="font-size:1.2em; font-weight:800; color:var(--blue); min-width:1.4em; line-height:1.4;">1</span>
+        <span style="font-size:0.65em; line-height:1.65;">Noisy context degrades reasoning and increases cost. <strong>They are the same engineering problem</strong> — and this is measurable. (This is not a best-practice recommendation. It is a measured outcome from real sessions.)</span>
+      </div>
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:0.5em 0.9em; display:flex; gap:0.7em; align-items:flex-start;">
+        <span style="font-size:1.2em; font-weight:800; color:var(--blue); min-width:1.4em; line-height:1.4;">2</span>
+        <span style="font-size:0.65em; line-height:1.65;">Context hygiene and model routing are available <strong>today</strong>. No infrastructure change required — start with disabling unused MCPs and skills, and scoping your first message precisely.</span>
+      </div>
+      <div style="background:var(--bg2); border:1px solid var(--green); border-radius:8px; padding:0.5em 0.9em; display:flex; gap:0.7em; align-items:flex-start;">
+        <span style="font-size:1.2em; font-weight:800; color:var(--green); min-width:1.4em; line-height:1.4;">3</span>
+        <span style="font-size:0.65em; line-height:1.65;">A tiered workflow with context isolation delivers <strong>better reasoning quality at 2–5× lower cost</strong>, based on real measured sessions. The difference between convenience architecture and production architecture is not tooling — it is <strong>intentionality</strong>.</span>
+      </div>
+    </div>
+    <div class="callout blue" style="margin-top:0.6em; font-size:0.65em; text-align:center;">
+      <strong>Call to action:</strong> Try the workflow on one real task. Run the analysis scripts. Compare.
+    </div>
+  </div>
+  </div><!--/slide-body-->
+  </div>
+  <aside class="notes">
+    Three takeaways. All three are grounded in measured data, not theory.
+    The call to action is concrete and low-friction — one task, the scripts do the rest.
+    The evidence speaks for itself once you can see it.
+  </aside>
+</section>
+
+</div><!-- /.slides -->
+</div><!-- /.reveal -->
+
+<!-- Reveal.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    progress: true,
+    controls: true,
+    center: false,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'fade',
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0,
+    disableLayout: false,
+    plugins: [ RevealNotes ]
+  });
+</script>
+</body>
+</html>
