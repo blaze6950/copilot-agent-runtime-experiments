@@ -68,7 +68,7 @@ Get-ChildItem "C:\Users\USER\.copilot\session-state\*\events.jsonl" | Select-Obj
 ### Step 2: Run export scripts in parallel (one per session)
 For each session with events.jsonl, run:
 ```powershell
-dotnet script "C:\Users\USER\.copilot\session-state\scripts\export-events.csx" "C:\Users\USER\.copilot\session-state\{session-id}\events.jsonl"
+dotnet script "C:\Users\USER\.copilot\session-state\scripts\export-events.csx" "C:\Users\USER\.copilot\session-state\{session-id}\events.jsonl" --out
 ```
 Run ALL sessions in parallel (launch all, then read all outputs).
 Each run writes `export.json` beside the events file.
