@@ -142,6 +142,22 @@ Extract from each export:
       answer    // full final-answer text; contentSnippet in timeline is truncated to 120 chars
     }
   ],
+  segmentCount,   // number of session.shutdown events (= number of segments)
+  segments: [
+    {
+      index,                // 1-based
+      resumeTs,             // ISO timestamp; null if session.resume not found for this segment
+      shutdownTs,           // ISO timestamp
+      durationMs,           // wall-clock duration of this segment; null if resumeTs unavailable
+      totalPremiumRequests,
+      totalApiDurationMs,
+      codeChanges: [ "file/path" ],
+      modelMetrics: {
+        "<modelName>": { requests, cost, inputTokens, outputTokens,
+                         cacheReadTokens, cacheWriteTokens, reasoningTokens }
+      }
+    }
+  ],
   timeline: {
     lanes: [
       {

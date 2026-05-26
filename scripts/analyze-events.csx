@@ -15,6 +15,7 @@ using Spectre.Console;
 //   dotnet script analyze-events.csx path\to\session-dir\          # directory — finds events.jsonl inside
 //   dotnet script analyze-events.csx <path> --timeline             # include full per-lane timeline
 //   dotnet script analyze-events.csx <path> --dispatches           # include full subagent dispatch detail
+//   dotnet script analyze-events.csx <path> --segments             # include per-segment token/cost breakdown in Section K
 //
 // REQUIREMENTS:
 //   dotnet-script 2.x  (dotnet tool install -g dotnet-script)
@@ -30,9 +31,10 @@ using Spectre.Console;
 //   E  Graph Statistics
 //   H  Tool Usage Statistics
 //   J  Error / Warning Report
-//   K  Token / Cost Table
+//   K  Token / Cost Table       (aggregated across all session segments)
 //   I  Subagent Dispatches  (only with --dispatches flag)
 //   F  Timeline             (only with --timeline flag)
+//      Per-segment detail   (only with --segments flag, shown inside Section K)
 
 // ── tunables ─────────────────────────────────────────────────────────────────
 const int TimelineMaxEventsPerLane = 0;     // cap per-lane timeline lines (0 = unlimited)
@@ -40,6 +42,7 @@ const int TimelineMaxEventsPerLane = 0;     // cap per-lane timeline lines (0 = 
 // ── parse flags ──────────────────────────────────────────────────────────────
 bool showTimeline   = Args.Remove("--timeline");
 bool showDispatches = Args.Remove("--dispatches");
+bool showSegments   = Args.Remove("--segments");
 
 // ── resolve input path ────────────────────────────────────────────────────────
 var scriptDir = Path.GetDirectoryName(Path.GetFullPath(Environment.GetCommandLineArgs()
@@ -63,7 +66,7 @@ else
 if (!File.Exists(inputPath))
 {
     Console.Error.WriteLine($"ERROR: File not found: {inputPath}");
-    Console.Error.WriteLine("Usage: dotnet script analyze-events.csx [path/to/events.jsonl] [--timeline] [--dispatches]");
+    Console.Error.WriteLine("Usage: dotnet script analyze-events.csx [path/to/events.jsonl] [--timeline] [--dispatches] [--segments]");
     return;
 }
 
@@ -379,9 +382,119 @@ else
 
 AnsiConsole.Write(new Rule("[bold yellow]TOKEN / COST TABLE[/]").RuleStyle("yellow").LeftJustified());
 
+// Load all shutdown events; keep last for point-in-time state fields.
 JsonNode? shutdownEv = null;
+List<JsonNode> allShutdownEvs = new();
 if (offsetsByType.TryGetValue("session.shutdown", out List<long>? shutdownOffsets) && shutdownOffsets != null && shutdownOffsets.Count > 0)
-    shutdownEv = SeekLine(shutdownOffsets[^1]);
+{
+    allShutdownEvs = SeekMany(shutdownOffsets).OrderBy(e => ParseTimestampStr(SafeStr(e, "timestamp"))).ToList();
+    shutdownEv = allShutdownEvs[^1];
+}
+
+// Sorted session.start events for pairing with shutdown segments.
+// Segment 1 resume = session.start timestamp; segments 2..N resume = session.resume whose parentId = prior shutdown id.
+string? sessionStartTs = null;
+if (offsetsByType.TryGetValue("session.start", out List<long>? startOffsets) && startOffsets != null && startOffsets.Count > 0)
+    sessionStartTs = SafeStr(SeekMany(startOffsets).OrderBy(e => ParseTimestampStr(SafeStr(e, "timestamp"))).First(), "timestamp");
+
+var resumeTsByShutdownId = new Dictionary<string, string>(StringComparer.Ordinal);
+if (offsetsByType.TryGetValue("session.resume", out List<long>? resumeOffsets) && resumeOffsets != null)
+{
+    foreach (var ev in SeekMany(resumeOffsets))
+    {
+        var parentId = ev["parentId"]?.GetValue<string>();
+        var ts       = SafeStr(ev, "timestamp");
+        if (parentId != null && ts != null)
+            resumeTsByShutdownId[parentId] = ts;
+    }
+}
+
+// Helper: render a model-metrics table for a given set of model entries.
+void RenderModelMetricsTable(IReadOnlyDictionary<string, (long reqs, double cost, long inTok, long outTok, long cacheRd, long cacheWr, long reason)> metrics)
+{
+    Console.WriteLine();
+    var t = new Table()
+        .NoBorder()
+        .AddColumn(new TableColumn("[bold white]Model[/]").NoWrap())
+        .AddColumn(new TableColumn("[bold white]Reqs[/]").RightAligned().NoWrap())
+        .AddColumn(new TableColumn("[bold white]Cost[/]").RightAligned().NoWrap())
+        .AddColumn(new TableColumn("[bold white]Input[/]").RightAligned().Width(10).NoWrap())
+        .AddColumn(new TableColumn("[bold white]Output[/]").RightAligned().Width(8).NoWrap())
+        .AddColumn(new TableColumn("[bold white]CacheRd[/]").RightAligned().Width(10).NoWrap())
+        .AddColumn(new TableColumn("[bold white]CacheWr[/]").RightAligned().Width(9).NoWrap())
+        .AddColumn(new TableColumn("[bold white]Reason[/]").RightAligned().Width(8).NoWrap());
+
+    long totIn = 0, totOut = 0, totCacheRd = 0, totCacheWr = 0;
+    foreach (var kv in metrics)
+    {
+        var (reqs, cost, inTok, outTok, cacheRd, cacheWr, reason) = kv.Value;
+        var costMarkup = cost > 0 ? $"[yellow1]{cost}[/]" : $"[grey]{cost}[/]";
+        t.AddRow(
+            $"[white]{Markup.Escape(kv.Key)}[/]",
+            $"[aqua]{reqs}[/]",
+            costMarkup,
+            $"[silver]{inTok}[/]",
+            $"[silver]{outTok}[/]",
+            $"[grey]{cacheRd}[/]",
+            $"[grey]{cacheWr}[/]",
+            $"[grey]{reason}[/]");
+        totIn += inTok; totOut += outTok; totCacheRd += cacheRd; totCacheWr += cacheWr;
+    }
+    t.AddEmptyRow();
+    t.AddRow(
+        "[bold white]TOTAL[/]", "", "",
+        $"[bold aqua]{totIn}[/]",
+        $"[bold aqua]{totOut}[/]",
+        $"[bold silver]{totCacheRd}[/]",
+        $"[bold silver]{totCacheWr}[/]",
+        "");
+    AnsiConsole.Write(t);
+}
+
+// Helper: build aggregated metrics dict (insertion-order) from a single shutdown event.
+Dictionary<string, (long reqs, double cost, long inTok, long outTok, long cacheRd, long cacheWr, long reason)>
+    MetricsFromShutdown(JsonNode ev)
+{
+    var result = new Dictionary<string, (long, double, long, long, long, long, long)>(StringComparer.Ordinal);
+    var mm = ev["data"]?["modelMetrics"];
+    if (mm is not JsonObject mmObj) { return result; }
+    foreach (var kv in mmObj)
+    {
+        var mv = kv.Value;
+        result[kv.Key] = (
+            mv?["requests"]?["count"]?.GetValue<long?>()        ?? 0,
+            mv?["requests"]?["cost"]?.GetValue<double?>()       ?? 0,
+            mv?["usage"]?["inputTokens"]?.GetValue<long?>()     ?? 0,
+            mv?["usage"]?["outputTokens"]?.GetValue<long?>()    ?? 0,
+            mv?["usage"]?["cacheReadTokens"]?.GetValue<long?>() ?? 0,
+            mv?["usage"]?["cacheWriteTokens"]?.GetValue<long?>() ?? 0,
+            mv?["usage"]?["reasoningTokens"]?.GetValue<long?>() ?? 0
+        );
+    }
+    return result;
+}
+
+// Helper: accumulate a per-shutdown metrics dict into the running aggregate (insertion-order).
+void AccumulateMetrics(
+    Dictionary<string, (long reqs, double cost, long inTok, long outTok, long cacheRd, long cacheWr, long reason)> agg,
+    IReadOnlyDictionary<string, (long reqs, double cost, long inTok, long outTok, long cacheRd, long cacheWr, long reason)> src)
+{
+    foreach (var kv in src)
+    {
+        if (agg.TryGetValue(kv.Key, out var ex))
+        {
+            agg[kv.Key] = (
+                ex.reqs + kv.Value.reqs, ex.cost + kv.Value.cost,
+                ex.inTok + kv.Value.inTok, ex.outTok + kv.Value.outTok,
+                ex.cacheRd + kv.Value.cacheRd, ex.cacheWr + kv.Value.cacheWr,
+                ex.reason + kv.Value.reason);
+        }
+        else
+        {
+            agg[kv.Key] = kv.Value;
+        }
+    }
+}
 
 if (shutdownEv == null)
 {
@@ -389,84 +502,133 @@ if (shutdownEv == null)
 }
 else
 {
+    // ── Point-in-time state from last shutdown ────────────────────────────────
     var sd = shutdownEv["data"];
-    AnsiConsole.MarkupLine($"  [silver]Shutdown type        :[/] [white]{Markup.Escape(SafeStr(sd,"shutdownType") ?? "?")}[/]");
-    AnsiConsole.MarkupLine($"  [silver]Session start (Unix) :[/] [white]{sd?["sessionStartTime"]}[/]");
-    AnsiConsole.MarkupLine($"  [silver]Total API duration   :[/] [aqua]{sd?["totalApiDurationMs"]}[/]ms");
-    AnsiConsole.MarkupLine($"  [silver]Total premium reqs   :[/] [aqua]{sd?["totalPremiumRequests"]}[/]");
+    AnsiConsole.MarkupLine($"  [silver]Shutdown type        :[/] [white]{Markup.Escape(SafeStr(sd, "shutdownType") ?? "?")}[/]");
 
-    var cc = sd?["codeChanges"];
-    if (cc != null)
-        AnsiConsole.MarkupLine($"  [silver]Code changes         :[/] [chartreuse2]+{cc["linesAdded"]}[/] / [red1]-{cc["linesRemoved"]}[/] lines in [white]{cc["filesModified"]?.AsArray()?.Count ?? 0}[/] files");
+    // Overall session wall-clock span
+    var overallStart = sessionStartTs;
+    var overallEnd   = SafeStr(shutdownEv, "timestamp");
+    if (overallStart != null && DateTimeOffset.TryParse(overallStart, out var oS) && DateTimeOffset.TryParse(overallEnd, out var oE))
+    {
+        var oSpan = oE - oS;
+        AnsiConsole.MarkupLine($"  [silver]Session start        :[/] [white]{Markup.Escape(overallStart)}[/]");
+        AnsiConsole.MarkupLine($"  [silver]Session end          :[/] [white]{Markup.Escape(overallEnd ?? "?")}[/]");
+        AnsiConsole.MarkupLine($"  [silver]Wall-clock duration  :[/] [aqua]{(int)oSpan.TotalHours:D2}:{oSpan.Minutes:D2}:{oSpan.Seconds:D2}[/]");
+    }
+    else
+    {
+        AnsiConsole.MarkupLine($"  [silver]Session start (Unix) :[/] [white]{sd?["sessionStartTime"]}[/]");
+    }
 
-    var curModel  = SafeStr(sd, "currentModel");
-    var curTok    = sd?["currentTokens"]?.ToString();
-    var sysTok    = sd?["systemTokens"]?.ToString();
-    var convTok   = sd?["conversationTokens"]?.ToString();
+    // ── Aggregated scalars across all segments ────────────────────────────────
+    long aggApiDuration = allShutdownEvs.Sum(e => e["data"]?["totalApiDurationMs"]?.GetValue<long?>()  ?? 0);
+    int  aggPremiumReqs = allShutdownEvs.Sum(e => e["data"]?["totalPremiumRequests"]?.GetValue<int?>() ?? 0);
+
+    int segmentCount = allShutdownEvs.Count;
+    if (segmentCount > 1)
+        AnsiConsole.MarkupLine($"  [grey](aggregated across {segmentCount} session segments)[/]");
+
+    AnsiConsole.MarkupLine($"  [silver]Total API duration   :[/] [aqua]{aggApiDuration}[/]ms");
+    AnsiConsole.MarkupLine($"  [silver]Total premium reqs   :[/] [aqua]{aggPremiumReqs}[/]");
+
+    // codeChanges — insertion-order dedup across all segments
+    int aggLinesAdded = 0, aggLinesRemoved = 0;
+    var aggFilesSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    var aggFiles = new List<string>();
+    foreach (var ev in allShutdownEvs)
+    {
+        var cc = ev["data"]?["codeChanges"];
+        if (cc == null) { continue; }
+        aggLinesAdded   += cc["linesAdded"]?.GetValue<int?>()   ?? 0;
+        aggLinesRemoved += cc["linesRemoved"]?.GetValue<int?>() ?? 0;
+        foreach (var f in cc["filesModified"]?.AsArray() ?? new JsonArray())
+        {
+            var fStr = f?.GetValue<string>();
+            if (fStr != null && aggFilesSeen.Add(fStr)) { aggFiles.Add(fStr); }
+        }
+    }
+    if (aggLinesAdded > 0 || aggLinesRemoved > 0 || aggFiles.Count > 0)
+        AnsiConsole.MarkupLine($"  [silver]Code changes         :[/] [chartreuse2]+{aggLinesAdded}[/] / [red1]-{aggLinesRemoved}[/] lines in [white]{aggFiles.Count}[/] files");
+
+    // ── Point-in-time current context from last shutdown ──────────────────────
+    var curModel   = SafeStr(sd, "currentModel");
+    var curTok     = sd?["currentTokens"]?.ToString();
+    var sysTok     = sd?["systemTokens"]?.ToString();
+    var convTok    = sd?["conversationTokens"]?.ToString();
     var toolDefTok = sd?["toolDefinitionsTokens"]?.ToString();
     if (curModel != null)
         AnsiConsole.MarkupLine($"  [silver]Current model        :[/] [white]{Markup.Escape(curModel)}[/]");
     if (curTok != null)
         AnsiConsole.MarkupLine($"  [silver]Current tokens       :[/] [aqua]{Markup.Escape(curTok)}[/]  [grey](system=[/][silver]{Markup.Escape(sysTok ?? "?")}[/][grey]  conversation=[/][silver]{Markup.Escape(convTok ?? "?")}[/][grey]  toolDefs=[/][silver]{Markup.Escape(toolDefTok ?? "?")}[/][grey])[/]");
 
-    var mm = sd?["modelMetrics"];
-    if (mm is JsonObject mmObj && mmObj.Count > 0)
+    // ── Build aggregated model metrics ────────────────────────────────────────
+    var aggMetrics = new Dictionary<string, (long reqs, double cost, long inTok, long outTok, long cacheRd, long cacheWr, long reason)>(StringComparer.Ordinal);
+    foreach (var ev in allShutdownEvs)
+        AccumulateMetrics(aggMetrics, MetricsFromShutdown(ev));
+
+    if (aggMetrics.Count == 0)
     {
-        long totalIn = 0, totalOut = 0, totalCacheRd = 0, totalCacheWr = 0;
-        foreach (var kv in mmObj)
-        {
-            totalIn      += kv.Value?["usage"]?["inputTokens"]?.GetValue<long?>()      ?? 0;
-            totalOut     += kv.Value?["usage"]?["outputTokens"]?.GetValue<long?>()     ?? 0;
-            totalCacheRd += kv.Value?["usage"]?["cacheReadTokens"]?.GetValue<long?>()  ?? 0;
-            totalCacheWr += kv.Value?["usage"]?["cacheWriteTokens"]?.GetValue<long?>() ?? 0;
-        }
-
-        Console.WriteLine();
-        var tokenTable = new Table()
-            .NoBorder()
-            .AddColumn(new TableColumn("[bold white]Model[/]").NoWrap())
-            .AddColumn(new TableColumn("[bold white]Reqs[/]").RightAligned().NoWrap())
-            .AddColumn(new TableColumn("[bold white]Cost[/]").RightAligned().NoWrap())
-            .AddColumn(new TableColumn("[bold white]Input[/]").RightAligned().Width(10).NoWrap())
-            .AddColumn(new TableColumn("[bold white]Output[/]").RightAligned().Width(8).NoWrap())
-            .AddColumn(new TableColumn("[bold white]CacheRd[/]").RightAligned().Width(10).NoWrap())
-            .AddColumn(new TableColumn("[bold white]CacheWr[/]").RightAligned().Width(9).NoWrap())
-            .AddColumn(new TableColumn("[bold white]Reason[/]").RightAligned().Width(8).NoWrap());
-
-        foreach (var kv in mmObj)
-        {
-            var model  = kv.Key;
-            var mv     = kv.Value;
-            var reqs   = mv?["requests"]?["count"]?.ToString() ?? "";
-            var cost   = mv?["requests"]?["cost"]?.ToString()  ?? "";
-            var usage  = mv?["usage"];
-            var costNum = mv?["requests"]?["cost"]?.GetValue<double?>() ?? 0;
-            var costMarkup = costNum > 0 ? $"[yellow1]{Markup.Escape(cost)}[/]" : $"[grey]{Markup.Escape(cost)}[/]";
-            tokenTable.AddRow(
-                $"[white]{Markup.Escape(model)}[/]",
-                $"[aqua]{Markup.Escape(reqs)}[/]",
-                costMarkup,
-                $"[silver]{Markup.Escape(usage?["inputTokens"]?.ToString()      ?? "")}[/]",
-                $"[silver]{Markup.Escape(usage?["outputTokens"]?.ToString()     ?? "")}[/]",
-                $"[grey]{Markup.Escape(usage?["cacheReadTokens"]?.ToString()  ?? "")}[/]",
-                $"[grey]{Markup.Escape(usage?["cacheWriteTokens"]?.ToString() ?? "")}[/]",
-                $"[grey]{Markup.Escape(usage?["reasoningTokens"]?.ToString()  ?? "")}[/]");
-        }
-
-        tokenTable.AddEmptyRow();
-        tokenTable.AddRow(
-            "[bold white]TOTAL[/]", "", "",
-            $"[bold aqua]{totalIn}[/]",
-            $"[bold aqua]{totalOut}[/]",
-            $"[bold silver]{totalCacheRd}[/]",
-            $"[bold silver]{totalCacheWr}[/]",
-            "");
-
-        AnsiConsole.Write(tokenTable);
+        AnsiConsole.MarkupLine("  [grey](no modelMetrics found in shutdown event)[/]");
     }
     else
     {
-        AnsiConsole.MarkupLine("  [grey](no modelMetrics found in shutdown event)[/]");
+        // ── Optional per-segment breakdown ────────────────────────────────────
+        if (showSegments && segmentCount > 1)
+        {
+            for (int si = 0; si < allShutdownEvs.Count; si++)
+            {
+                var segShutdown = allShutdownEvs[si];
+                // Pair with session.start by position (best-effort; starts may be fewer than shutdowns if crash)
+                // Segment 1: started by session.start; segments 2+: started by session.resume parented to prior shutdown.
+                string? segResumeTs = si == 0
+                    ? sessionStartTs
+                    : resumeTsByShutdownId.GetValueOrDefault(allShutdownEvs[si - 1]["id"]?.GetValue<string>() ?? "");
+                var segShutdownTs = SafeStr(segShutdown, "timestamp");
+                string segDuration = "?";
+                if (segResumeTs != null && segShutdownTs != null &&
+                    DateTimeOffset.TryParse(segResumeTs, out var ssS) &&
+                    DateTimeOffset.TryParse(segShutdownTs, out var ssE))
+                {
+                    var sp = ssE - ssS;
+                    segDuration = $"{(int)sp.TotalHours:D2}:{sp.Minutes:D2}:{sp.Seconds:D2}";
+                }
+
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine($"  [bold grey]Segment {si + 1} of {segmentCount}[/]");
+                if (segResumeTs != null)
+                    AnsiConsole.MarkupLine($"    [grey]Resume  :[/] [silver]{Markup.Escape(segResumeTs)}[/]");
+                AnsiConsole.MarkupLine($"    [grey]Shutdown:[/] [silver]{Markup.Escape(segShutdownTs ?? "?")}[/]");
+                AnsiConsole.MarkupLine($"    [grey]Duration:[/] [silver]{Markup.Escape(segDuration)}[/]");
+
+                var segMetrics = MetricsFromShutdown(segShutdown);
+                if (segMetrics.Count > 0)
+                    RenderModelMetricsTable(segMetrics);
+                else
+                    AnsiConsole.MarkupLine("    [grey](no modelMetrics for this segment)[/]");
+            }
+            AnsiConsole.WriteLine();
+        }
+
+        // ── Session totals table ──────────────────────────────────────────────
+        var totalsLabel = segmentCount > 1
+            ? $"[bold yellow]SESSION TOTALS[/]  [grey]({segmentCount} segments)[/]"
+            : "[bold yellow]TOKEN / COST TABLE[/]";
+        AnsiConsole.Write(new Rule(totalsLabel).RuleStyle("yellow").LeftJustified());
+
+        if (segmentCount > 1)
+        {
+            // Overall session span summary for totals section
+            var overallStartTs = sessionStartTs;
+            var overallEndTs   = SafeStr(allShutdownEvs[^1], "timestamp");
+            if (overallStartTs != null)
+                AnsiConsole.MarkupLine($"  [grey]Session start:[/] [silver]{Markup.Escape(overallStartTs)}[/]  [grey]End:[/] [silver]{Markup.Escape(overallEndTs ?? "?")}[/]");
+
+            if (!showSegments)
+                AnsiConsole.MarkupLine("  [grey]tip: use --segments to show per-segment breakdown[/]");
+        }
+
+        RenderModelMetricsTable(aggMetrics);
     }
 }
 

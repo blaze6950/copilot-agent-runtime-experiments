@@ -25,8 +25,14 @@ dotnet script scripts\analyze-events.csx <path> --dispatches
 # With timeline (per-lane event list)
 dotnet script scripts\analyze-events.csx <path> --timeline
 
+# With per-segment token/cost breakdown in Section K
+dotnet script scripts\analyze-events.csx <path> --segments
+
 # Both flags together
 dotnet script scripts\analyze-events.csx <path> --dispatches --timeline
+
+# All flags together
+dotnet script scripts\analyze-events.csx <path> --dispatches --timeline --segments
 
 # JSON export (writes export.json beside input; also prints to stdout)
 dotnet script scripts\export-events.csx <path>
@@ -81,7 +87,8 @@ structured fields for every known event type. All annotation builders return thi
 | E | always | Graph statistics — depth, orphans, tool chain length |
 | H | always | Tool usage — calls, success rate, avg/min/max duration |
 | J | always | Error / warning report with scope labels |
-| K | always | Token / cost table from session.shutdown modelMetrics |
+| K | always | Token / cost table — aggregated across all session segments; shows session wall-clock span, total API duration, premium requests, and code changes; note shown if session has multiple segments |
+| K | `--segments` | Also renders a per-segment breakdown before the totals: each segment shows resume/shutdown timestamps, duration, and its own model metrics table |
 | I | `--dispatches` | Full subagent dispatch detail (prompt + answer + tools) |
 | F | `--timeline` | Per-lane chronological event list |
 
@@ -94,8 +101,13 @@ structured fields for every known event type. All annotation builders return thi
   "sessionEnd":   "2026-05-17T12:00:00Z",
   "durationMs":   7200000,
   "shutdownType": "normal",
+  "segmentCount": 1,             // number of session.shutdown events (>1 if session was resumed)
   "cwd":          "C:\\project",
   "copilotVersion": "1.2.3",
+
+  // Aggregated across ALL session segments (not just the last shutdown)
+  "totalPremiumRequests": 42,
+  "totalApiDurationMs":   9876543,
 
   "eventTypeCounts": { "tool.execution_complete": 120, ... },
 
@@ -112,6 +124,30 @@ structured fields for every known event type. All annotation builders return thi
 
   "compactionEvents": [ { "ts": "...", "tokensBefore": 148000, "tokensAfter": null } ],
 
+  // One entry per session segment (each session resume → shutdown pair).
+  // resumeTs is null if the corresponding session.start event is missing (e.g. crash recovery).
+  // Paired positionally: segment[0] = start[0] → shutdown[0], etc.
+  "segments": [
+    {
+      "index": 1,
+      "resumeTs":             "2026-05-17T10:00:00Z",
+      "shutdownTs":           "2026-05-17T11:30:00Z",
+      "durationMs":           5400000,
+      "totalPremiumRequests": 20,
+      "totalApiDurationMs":   4321000,
+      "codeChanges": { "linesAdded": 12, "linesRemoved": 3, "filesModified": ["src/foo.cs"] },
+      "modelMetrics": {
+        "claude-opus-4.6": {
+          "requests": 20, "cost": 3.0,
+          "inputTokens": 520903, "outputTokens": 8218,
+          "cacheReadTokens": 390103, "cacheWriteTokens": 130411,
+          "reasoningTokens": null
+        }
+      }
+    }
+  ],
+
+  // Aggregated across ALL session segments
   "modelMetrics": {
     "claude-sonnet-4.6": {
       "requests": 12, "cost": 0.42,
@@ -197,3 +233,13 @@ the full text corresponding to a snippet, search `answer` fields by substring.
 | `tool.execution_complete` has no `toolName` | Resolve via `toolCallId` cross-reference |
 | `hook.start`/`hook.end` match via `hookInvocationId` | Not via `parentId` |
 | Subagent `assistant.message` scoped via `parentToolCallId` | Not in the orchestrator lane |
+
+## Test Sessions
+
+| Session ID | Size | Notes |
+|---|---|---|
+| `d05a4c88-88e0-4ccc-be9a-8b36f6827d55` | ~808 events | Primary test; 13 subagents |
+| `65e0fe77-cba3-4fac-b9dd-4dc4aaa0e9f5` | ~1632 events | Has abort, compaction, subagent.failed |
+| `6f1e66f1-75ff-427a-8642-65c19f93861d` | ~3709 events | 4 session segments; multi-model; good test for --segments and aggregation |
+| `07061697-bbea-499e-aee0-87da13085544` | 14.5 MB | Lines > 256 KB; SeekLine buffer stress test |
+| `5201768c-8da9-46c2-8276-40f9bc203f24` | 108 MB | Stress test (low priority) |

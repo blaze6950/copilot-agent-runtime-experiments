@@ -22,7 +22,8 @@ using System.Text.Json.Serialization;
 //   • Confirmation line on stderr: "Wrote export.json → <path>"
 //
 // SCHEMA (top-level keys):
-//   sessionId, sessionStart, sessionEnd, durationMs, shutdownType, cwd, copilotVersion
+//   sessionId, sessionStart, sessionEnd, durationMs, shutdownType, segmentCount, cwd, copilotVersion
+//   totalPremiumRequests, totalApiDurationMs  — aggregated across all session segments
 //   eventTypeCounts       — { type: count }
 //   graphStats            — { total, totalEdges, roots, orphans, maxDepth, avgBranching,
 //                             internalNodes, leafNodes, maxToolChainLen, hookPairs,
@@ -30,8 +31,11 @@ using System.Text.Json.Serialization;
 //   hookPairs             — [ { hookType, durationMs, success } ]
 //   modelChanges          — [ { ts, previousModel, newModel } ]
 //   compactionEvents      — [ { ts, tokensBefore, tokensAfter } ]
+//   segments              — [ { index, resumeTs, shutdownTs, durationMs, totalPremiumRequests,
+//                               totalApiDurationMs, codeChanges, modelMetrics } ]  (one per segment)
 //   modelMetrics          — { modelName: { requests, cost, inputTokens, outputTokens,
 //                                          cacheReadTokens, cacheWriteTokens, reasoningTokens } }
+//                           aggregated across all session segments
 //   toolStats             — [ { name, calls, successes, avgDurationMs, minDurationMs, maxDurationMs } ]
 //   errors                — [ { ts, type, scope, detail } ]
 //   errorCount            — int
@@ -134,11 +138,17 @@ if (offsetsByType.TryGetValue("session.start", out List<long> startOffsets) && s
     cwd            = SafeStr(d?["context"], "cwd");
 }
 
+// Populated in the shutdown block below; used by both model-metrics and segments sections.
+List<JsonNode> allShutEvs = new();
+
 if (offsetsByType.TryGetValue("session.shutdown", out List<long> shutOffsets) && shutOffsets?.Count > 0)
 {
-    var ev = SeekLine(shutOffsets[^1]);
-    var d  = ev["data"];
-    sessionEnd   = SafeStr(ev, "timestamp");
+    allShutEvs = SeekMany(shutOffsets).OrderBy(e => ParseTimestampStr(SafeStr(e, "timestamp"))).ToList();
+    var lastEv = allShutEvs[^1];
+    var d  = lastEv["data"];
+
+    // Point-in-time fields: from last shutdown only
+    sessionEnd   = SafeStr(lastEv, "timestamp");
     shutdownType = SafeStr(d, "shutdownType");
     if (sessionStart != null && sessionEnd != null &&
         DateTimeOffset.TryParse(sessionStart, out var s) &&
@@ -146,22 +156,44 @@ if (offsetsByType.TryGetValue("session.shutdown", out List<long> shutOffsets) &&
     {
         sessionDuration = (e - s).TotalMilliseconds;
     }
-    try { totalPremiumRequests  = d?["totalPremiumRequests"]?.GetValue<int?>(); }  catch { }
-    try { totalApiDurationMs    = d?["totalApiDurationMs"]?.GetValue<long?>();  }  catch { }
     try { sessionStartTime      = d?["sessionStartTime"]?.GetValue<long?>();    }  catch { }
     try { currentModel          = SafeStr(d, "currentModel"); }                    catch { }
     try { currentTokens         = d?["currentTokens"]?.GetValue<int?>();        }  catch { }
     try { systemTokens          = d?["systemTokens"]?.GetValue<int?>();         }  catch { }
     try { conversationTokens    = d?["conversationTokens"]?.GetValue<int?>();   }  catch { }
     try { toolDefinitionsTokens = d?["toolDefinitionsTokens"]?.GetValue<int?>(); } catch { }
-    var cc = d?["codeChanges"];
-    if (cc != null)
+
+    // Aggregated fields: sum across all shutdown segments
+    try { totalPremiumRequests = allShutEvs.Sum(ev => ev["data"]?["totalPremiumRequests"]?.GetValue<int?>()  ?? 0); } catch { }
+    try { totalApiDurationMs   = allShutEvs.Sum(ev => ev["data"]?["totalApiDurationMs"]?.GetValue<long?>()   ?? 0); } catch { }
+
+    // codeChanges: sum lines, union files (insertion-order dedup)
+    int totalAdded = 0, totalRemoved = 0;
+    var filesSeen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    var filesOrdered = new List<string>();
+    bool anyCodeChanges = false;
+    foreach (var ev in allShutEvs)
     {
-        try { codeChangesLinesAdded   = cc["linesAdded"]?.GetValue<int?>();   } catch { }
-        try { codeChangesLinesRemoved = cc["linesRemoved"]?.GetValue<int?>(); } catch { }
+        var cc = ev["data"]?["codeChanges"];
+        if (cc == null) { continue; }
+        anyCodeChanges = true;
+        try { totalAdded   += cc["linesAdded"]?.GetValue<int?>()   ?? 0; } catch { }
+        try { totalRemoved += cc["linesRemoved"]?.GetValue<int?>() ?? 0; } catch { }
         var modArr = cc["filesModified"]?.AsArray();
         if (modArr != null)
-            codeChangesFiles = modArr.Select(n => n?.GetValue<string>() ?? "").ToList();
+        {
+            foreach (var n in modArr)
+            {
+                var fs = n?.GetValue<string>();
+                if (fs != null && filesSeen.Add(fs)) { filesOrdered.Add(fs); }
+            }
+        }
+    }
+    if (anyCodeChanges)
+    {
+        codeChangesLinesAdded   = totalAdded;
+        codeChangesLinesRemoved = totalRemoved;
+        codeChangesFiles        = filesOrdered;
     }
 }
 
@@ -270,31 +302,148 @@ if (offsetsByType.TryGetValue("session.compaction_complete", out List<long> comp
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// MODEL METRICS  (from session.shutdown)
+// SEGMENTS  (one entry per session.shutdown; resume time from session.start for segment 1, session.resume for segments 2+)
 // ═════════════════════════════════════════════════════════════════════════════
 
-var modelMetricsDict = new Dictionary<string, object>(StringComparer.Ordinal);
-if (offsetsByType.TryGetValue("session.shutdown", out List<long> shutOffsets2) && shutOffsets2?.Count > 0)
+string? sessionStartTs2 = null;
+if (offsetsByType.TryGetValue("session.start", out List<long> startOffsets2) && startOffsets2?.Count > 0)
+    sessionStartTs2 = SafeStr(SeekMany(startOffsets2).OrderBy(e => ParseTimestampStr(SafeStr(e, "timestamp"))).First(), "timestamp");
+
+var resumeTsByShutdownId2 = new Dictionary<string, string>(StringComparer.Ordinal);
+if (offsetsByType.TryGetValue("session.resume", out List<long> resumeOffsets2) && resumeOffsets2 != null)
 {
-    var sd = SeekLine(shutOffsets2[^1])["data"];
-    var mm = sd?["modelMetrics"];
-    if (mm is JsonObject mmObj)
+    foreach (var ev in SeekMany(resumeOffsets2))
     {
-        foreach (var kv in mmObj)
+        var parentId = ev["parentId"]?.GetValue<string>();
+        var ts       = SafeStr(ev, "timestamp");
+        if (parentId != null && ts != null)
+            resumeTsByShutdownId2[parentId] = ts;
+    }
+}
+
+var segmentsList = new List<object>();
+for (int si = 0; si < allShutEvs.Count; si++)
+{
+    var segShutEv = allShutEvs[si];
+    var segD      = segShutEv["data"];
+
+    // Segment 1: resume = session.start; segments 2+: resume = session.resume parented to prior shutdown.
+    string? segResumeTs = si == 0
+        ? sessionStartTs2
+        : resumeTsByShutdownId2.GetValueOrDefault(allShutEvs[si - 1]["id"]?.GetValue<string>() ?? "");
+
+    var segShutdownTs = SafeStr(segShutEv, "timestamp");
+    double? segDurationMs = null;
+    if (segResumeTs != null && segShutdownTs != null &&
+        DateTimeOffset.TryParse(segResumeTs, out var segS) &&
+        DateTimeOffset.TryParse(segShutdownTs, out var segE))
+    {
+        segDurationMs = (segE - segS).TotalMilliseconds;
+    }
+
+    // Per-segment codeChanges (insertion-order dedup within segment)
+    var segCc = segD?["codeChanges"];
+    object? segCodeChanges = null;
+    if (segCc != null)
+    {
+        var segFiles = segCc["filesModified"]?.AsArray()
+            ?.Select(n => n?.GetValue<string>() ?? "")
+            .ToList() ?? new List<string>();
+        segCodeChanges = new
+        {
+            linesAdded    = segCc["linesAdded"]?.GetValue<int?>()   ?? 0,
+            linesRemoved  = segCc["linesRemoved"]?.GetValue<int?>() ?? 0,
+            filesModified = segFiles
+        };
+    }
+
+    // Per-segment model metrics
+    var segMetrics = new Dictionary<string, object>(StringComparer.Ordinal);
+    var segMm = segD?["modelMetrics"];
+    if (segMm is JsonObject segMmObj)
+    {
+        foreach (var kv in segMmObj)
         {
             var mv = kv.Value;
-            modelMetricsDict[kv.Key] = new
+            var reason = mv?["usage"]?["reasoningTokens"]?.GetValue<long?>() ?? 0;
+            segMetrics[kv.Key] = new
             {
-                requests        = mv?["requests"]?["count"]?.GetValue<int?>(),
-                cost            = mv?["requests"]?["cost"]?.GetValue<double?>(),
-                inputTokens     = mv?["usage"]?["inputTokens"]?.GetValue<long?>(),
-                outputTokens    = mv?["usage"]?["outputTokens"]?.GetValue<long?>(),
+                requests         = mv?["requests"]?["count"]?.GetValue<int?>(),
+                cost             = mv?["requests"]?["cost"]?.GetValue<double?>(),
+                inputTokens      = mv?["usage"]?["inputTokens"]?.GetValue<long?>(),
+                outputTokens     = mv?["usage"]?["outputTokens"]?.GetValue<long?>(),
                 cacheReadTokens  = mv?["usage"]?["cacheReadTokens"]?.GetValue<long?>(),
                 cacheWriteTokens = mv?["usage"]?["cacheWriteTokens"]?.GetValue<long?>(),
-                reasoningTokens  = mv?["usage"]?["reasoningTokens"]?.GetValue<long?>()
+                reasoningTokens  = reason > 0 ? (long?)reason : null
             };
         }
     }
+
+    segmentsList.Add(new
+    {
+        index                = si + 1,
+        resumeTs             = segResumeTs,
+        shutdownTs           = segShutdownTs,
+        durationMs           = segDurationMs,
+        totalPremiumRequests = segD?["totalPremiumRequests"]?.GetValue<int?>(),
+        totalApiDurationMs   = segD?["totalApiDurationMs"]?.GetValue<long?>(),
+        codeChanges          = segCodeChanges,
+        modelMetrics         = segMetrics.Count > 0 ? segMetrics : null
+    });
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// MODEL METRICS  (aggregated across all session.shutdown events)
+// ═════════════════════════════════════════════════════════════════════════════
+
+var modelMetricsDict = new Dictionary<string, object>(StringComparer.Ordinal);
+// Insertion-order: first model encountered across segments defines key order.
+var modelKeySeen = new HashSet<string>(StringComparer.Ordinal);
+var modelAgg = new Dictionary<string, (long reqs, double cost, long inTok, long outTok, long cacheRd, long cacheWr, long reason)>(StringComparer.Ordinal);
+
+foreach (var shutEv in allShutEvs)
+{
+    var mm = shutEv["data"]?["modelMetrics"];
+    if (mm is not JsonObject mmObj) { continue; }
+    foreach (var kv in mmObj)
+    {
+        var mv = kv.Value;
+        var r = (
+            reqs:    mv?["requests"]?["count"]?.GetValue<long?>()        ?? 0,
+            cost:    mv?["requests"]?["cost"]?.GetValue<double?>()       ?? 0,
+            inTok:   mv?["usage"]?["inputTokens"]?.GetValue<long?>()     ?? 0,
+            outTok:  mv?["usage"]?["outputTokens"]?.GetValue<long?>()    ?? 0,
+            cacheRd: mv?["usage"]?["cacheReadTokens"]?.GetValue<long?>() ?? 0,
+            cacheWr: mv?["usage"]?["cacheWriteTokens"]?.GetValue<long?>() ?? 0,
+            reason:  mv?["usage"]?["reasoningTokens"]?.GetValue<long?>() ?? 0
+        );
+        modelKeySeen.Add(kv.Key);
+        if (modelAgg.TryGetValue(kv.Key, out var ex))
+        {
+            modelAgg[kv.Key] = (ex.reqs + r.reqs, ex.cost + r.cost,
+                ex.inTok + r.inTok, ex.outTok + r.outTok,
+                ex.cacheRd + r.cacheRd, ex.cacheWr + r.cacheWr, ex.reason + r.reason);
+        }
+        else
+        {
+            modelAgg[kv.Key] = r;
+        }
+    }
+}
+
+foreach (var key in modelAgg.Keys)
+{
+    var (reqs, cost, inTok, outTok, cacheRd, cacheWr, reason) = modelAgg[key];
+    modelMetricsDict[key] = new
+    {
+        requests         = (int)reqs,
+        cost,
+        inputTokens      = inTok,
+        outputTokens     = outTok,
+        cacheReadTokens  = cacheRd,
+        cacheWriteTokens = cacheWr,
+        reasoningTokens  = reason > 0 ? (long?)reason : null
+    };
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -745,6 +894,7 @@ var output = new
     sessionEnd,
     durationMs   = sessionDuration,
     shutdownType,
+    segmentCount     = allShutEvs.Count,
     totalPremiumRequests,
     totalApiDurationMs,
     sessionStartTime,
@@ -780,6 +930,7 @@ var output = new
     hookPairs        = hookPairsList,
     modelChanges     = modelChangesList,
     compactionEvents = compactionList,
+    segments         = segmentsList,
     modelMetrics     = modelMetricsDict,
     toolStats        = toolStatsList,
     errorCount       = errorsList.Count,
