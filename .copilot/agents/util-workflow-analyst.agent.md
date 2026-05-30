@@ -29,6 +29,27 @@ ONLY dispatch this agent:
 ### Model selection
 When dispatching `sub-researcher`, pass `model: claude-haiku-4.5`.
 
+## Token Accounting Model (CRITICAL — read before ANY cost calculation)
+
+Fields in `modelMetrics` are **additive**, not nested:
+- `inputTokens` = FRESH (uncached) input — full input rate
+- `cacheReadTokens` = cache hits — discounted input rate (multiplier from pricing lookup)
+- `cacheWriteTokens` = new cache entries — premium input rate (multiplier from pricing lookup)
+- `outputTokens` = generated output — full output rate
+
+**Total context per request** = (inputTokens + cacheReadTokens + cacheWriteTokens) / requests
+
+**Cost formula:**
+```
+cost = input×inputRate + cacheRead×cacheReadRate + cacheWrite×cacheWriteRate + output×outputRate
+```
+All four rates (input, output, cache_read, cache_write) come from Step 3 pricing lookup. Never hardcode.
+
+**Sanity checks (MUST pass before reporting):**
+1. Fresh input per request (`inputTokens/requests`) must be 1K–300K — outside = error
+2. Total context per request must be 20K–250K for orchestrator — outside = flag
+3. If cache savings appear > 60% → recheck arithmetic (typical is 30–40%)
+
 ## Script Architecture
 
 Scripts live at: `C:\Users\USER\.copilot\session-state\scripts\`
@@ -83,13 +104,14 @@ Then dispatch `sub-researcher` (model: claude-haiku-4.5):
 - Anthropic: https://www.anthropic.com/pricing
 - OpenAI: https://openai.com/api/pricing/
 
-Return a table: model | input $/M tokens | output $/M tokens | blended $/M tokens (blended = 70% input + 30% output weighted average).
-If a model is not listed or a page is unreachable, say so explicitly — do not guess."
+Return a table: model | input $/M | output $/M | cache_read $/M | cache_write $/M
+Fetch the actual cache pricing tiers from each provider's page — do not assume fixed multipliers.
+If a model is not listed or unreachable, say so — do not guess."
 
 If pricing cannot be fetched, set PRICING_UNAVAILABLE=true and skip all cost calculations.
 
 ### Step 4: Read export files and synthesize report
-Read each `export.json`. Calculate costs using ONLY the pricing from Step 3.
+Read each `export.json`. Calculate costs using the Token Accounting Model and pricing from Step 3.
 Extract from each export:
 
 **A. Subagent dispatches** — from `subagentDispatches[]`:
@@ -182,6 +204,8 @@ Extract from each export:
 
 ## Report Format
 
+Expand on findings. Use tables for data, prose for analysis and recommendations.
+
 ### Period
 Date range. Session IDs covered. Sessions skipped (no events.jsonl).
 
@@ -189,40 +213,43 @@ Date range. Session IDs covered. Sessions skipped (no events.jsonl).
 Source URL and fetch date. If unavailable: state this, skip all cost figures.
 
 ### Cost Summary
-Table: session | model | requests | inputTokens | outputTokens | est. cost ($)
-Total estimated cost (or "unavailable").
+Table: session | model | requests | freshInput | cacheRead | cacheWrite | output | cost ($)
+- Show sanity check results (fresh/request, context/request)
+- Cache efficiency: savings $ and % vs fully-uncached
+- Total estimated cost
+
+### Context Cleanliness
+- Subagent tool calls vs orchestrator tool calls (noise kept out of orchestrator)
+- Compression ratio: raw subagent tool calls ÷ orchestrator read_agent calls
+- Avg orchestrator context/request vs avg subagent context/request
+- Compactions per turn (lower = cleaner)
 
 ### Subagent Delegation
-Table: label | agentName | status | model | totalTokens | toolCalls | duration | est. cost ($)
-- Flag dispatches where totalTokens is null
-- Flag dispatches with durationMs > 300,000 (5 min)
-- Flag dispatches with toolCallCount = 0 (no tools used — potential prompt issue)
-
-### Model Routing Health
-- Token distribution by model (% input, % output)
-- Flag: any model consuming > 60% of total tokens
-- Flag: null-token dispatches > 30% of total dispatches
-- Flag: actual model in event differs from agent config model
+Table: label | agentName | status | model | totalTokens | toolCalls | duration | cost ($)
+- Flag: totalTokens null, duration > 5min, toolCalls = 0
+- Model routing savings: cost-if-all-orchestrator-model vs actual
 
 ### Session Hygiene
-For each session:
-- Turn count (flag if > 100)
-- Compaction count (flag if > 3)
-- Error count (flag if > 0)
-- Orphan events (flag if > 0)
-- Max tool chain length (flag if > 8 — indicates sequential bottleneck)
+Per session: turn count, compaction count, error count, orphans, max tool chain length.
+Flag thresholds: turns>100, compactions>3, errors>0, orphans>0, toolChain>8.
 
-### Top 3 Recommendations
-Ordered by estimated savings or impact. Create a todo item for each.
+### Effectiveness
+- Deliverable produced (from summary)
+- Subagent success rate, tool success rate
+- Turns-to-deliverable ratio
+
+### Top 5 Recommendations
+Ordered by impact. Include: what, expected benefit, effort (low/med/high).
 
 ### Anomalies
-Model mismatches. Null-token dispatches. High error counts. Missing events.jsonl.
-Subagent durations > 5 minutes. Large context windows (compactionEvents with tokensBefore > 150,000).
+Model mismatches. Null tokens. Errors. Missing events. Durations >5min. Context >150K.
+Impossible token ratios (fresh/request <1K or >300K).
 
 ## Behavioral Standards
 - ALWAYS run export scripts and sub-researcher BEFORE writing any numbers
 - NEVER hardcode or guess prices — use sub-researcher output only
+- ALWAYS apply Token Accounting Model — never assume inputTokens includes cache
+- ALWAYS run sanity checks before reporting costs
 - Count ALL subagentDispatches including null-token ones; never silently skip
 - Use ACTUAL model from export data, never assume from agent config
-- Keep report under 700 words — use tables, not prose
 - contentSnippet in timeline is truncated to 120 chars — search by substring to find full text in subagentDispatches[].answer
