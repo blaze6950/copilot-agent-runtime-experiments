@@ -21,7 +21,7 @@ You are a workflow efficiency analyst. You run data-extraction scripts directly 
 
 ### Allowed agent_type values
 ONLY dispatch this agent:
-- `sub-researcher` — for pricing lookups from official web pages
+- `sub-researcher-web` — for pricing lookups from official web pages
 
 ### PROHIBITED — built-in agents (NEVER dispatch these)
 - `sub-explorer`, `explore`, `task`, `general-purpose`, `code-review`, `research`
@@ -97,7 +97,7 @@ Each run writes `export.json` beside the events file.
 ### Step 3: Fetch model pricing (dispatch sub-researcher — serial, after Step 2)
 Wait for Step 2 to complete first.
 Extract the unique model names from the `modelMetrics` keys in the export JSON files.
-Then dispatch `sub-researcher` (model: claude-haiku-4.5):
+Then dispatch `sub-researcher-web` (model: claude-haiku-4.5):
 
 "Fetch current API pricing for the following models from official sources:
 {MODEL_LIST — filled from Step 2 output}
