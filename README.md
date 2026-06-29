@@ -33,14 +33,26 @@ Research and prototype repository for experimenting with:
 │       └── events-annotations.csx
 └── .copilot/
     └── agents/
-        ├── brainstorm.agent.md
-        ├── build.agent.md
-        ├── plan.agent.md
-        ├── sub-debugger.agent.md
-        ├── sub-explorer.agent.md
-        ├── sub-researcher.agent.md
-        ├── sub-reviewer.agent.md
-        └── util-workflow-analyst.agent.md
+        ├── brainstorm.agent.md          # Tier 1 — orchestrator (reasoning)
+        ├── plan.agent.md                # Tier 2 — execution planning
+        ├── build.agent.md               # Tier 2 — implementation
+        ├── build-dirty.agent.md         # Tier 2 — implementation (external writes)
+        ├── yolo.agent.md                # Tier 2 — autonomous implementation
+        ├── sub-explorer.agent.md        # Tier 3 — codebase exploration
+        ├── sub-debugger.agent.md        # Tier 3 — runtime diagnostics
+        ├── sub-reviewer.agent.md        # Tier 3 — code review
+        ├── sub-researcher-ado.agent.md          # Tier 3 — MCP keeper: Azure DevOps
+        ├── sub-researcher-argocd-nonprod.agent.md  # Tier 3 — MCP keeper: ArgoCD nonprod
+        ├── sub-researcher-argocd-prod.agent.md  # Tier 3 — MCP keeper: ArgoCD prod
+        ├── sub-researcher-backstage.agent.md    # Tier 3 — MCP keeper: Backstage
+        ├── sub-researcher-docs.agent.md         # Tier 3 — MCP keeper: library docs
+        ├── sub-researcher-edm.agent.md          # Tier 3 — MCP keeper: EDM schema
+        ├── sub-researcher-github.agent.md       # Tier 3 — MCP keeper: GitHub
+        ├── sub-researcher-newrelic.agent.md      # Tier 3 — MCP keeper: New Relic
+        ├── sub-researcher-scalr.agent.md        # Tier 3 — MCP keeper: Scalr
+        ├── sub-researcher-web.agent.md          # Tier 3 — MCP keeper: web research
+        ├── util-plugin-sync.agent.md    # Utility — plugin synchronization
+        └── util-workflow-analyst.agent.md  # Utility — workflow analysis
 ```
 
 ---
@@ -99,6 +111,20 @@ The workflow is based on an orchestrator/sub-agent architecture where:
 - expensive models are isolated to high-level reasoning
 - cheaper models are used for execution and exploration
 - context pollution is minimized through task isolation
+
+### MCP Keeper Pattern
+
+The research sub-agents follow a **keeper pattern** — one agent per MCP domain rather than a single monolithic researcher with all MCP tools attached.
+
+This was tested against the monolithic approach and showed significantly better results:
+
+- each keeper receives only the tools relevant to its domain
+- tool definition noise is eliminated (no irrelevant tools in context)
+- prompts are narrow and domain-specific
+- the orchestrator routes questions to the correct keeper by domain
+- keepers can be added/removed independently as MCP integrations change
+
+Current keepers: Azure DevOps, GitHub, Backstage, EDM, ArgoCD (prod/nonprod), New Relic, Scalr, library docs (Context7), and web research.
 
 The setup is intentionally modular and intended for experimentation and iteration.
 
