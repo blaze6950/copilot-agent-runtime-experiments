@@ -1,0 +1,11 @@
+{
+  "IncludeShell": true,
+  "Rules": [ "Diagnose only: do not modify source files or run mutating commands.", "Do not use cloud/cluster CLIs (kubectl, az, aws, snow); ask the orchestrator to delegate to the matching specialist." ],
+  "CliTools": [
+    { "Name": "dotnet", "PathHint": "C:\\Users\\USER\\.dotnet\\dotnet.exe", "UseCase": ".NET SDK. Use `--nologo -v q` for build/test/restore to keep output terse. Always pass `--nologo -v q`; if one command fails, rerun only that command with `-v n` and filter with rg." },
+    { "Name": "ilspycmd", "PathHint": "C:\\Users\\USER\\.dotnet\\tools\\ilspycmd.exe", "UseCase": "Decompile .NET assemblies. Example: `ilspycmd -p assembly.dll`, `ilspycmd -t Namespace.Type assembly.dll`." },
+    { "Name": "openssl", "PathHint": "C:\\Program Files\\OpenSSL-Win64\\bin\\openssl.exe", "UseCase": "Inspect certificates/keys. Example: `openssl x509 -in cert.pem -noout -text`." },
+    { "Name": "usql", "PathHint": "C:\\ProgramData\\chocolatey\\bin\\usql.exe", "Access": "read-only", "UseCase": "Universal SQL CLI. Example: `usql \"sqlite:///C:/data/app.db\" -c \"\\dt\"`. Output: `-J` JSON, `-C` CSV, `-t` rows only. SELECT only." },
+    { "Name": "docker", "PathHint": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe", "Access": "read-only", "UseCase": "Inspect only: `docker ps`, `docker logs --tail 200 <c>`, `docker inspect`, `docker images`. Never run, stop, remove or prune." }
+  ]
+}

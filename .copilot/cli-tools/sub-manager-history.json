@@ -1,0 +1,13 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "STRICTLY READ-ONLY. usql: open session-store.db with ?mode=ro; single SELECT / FTS MATCH statements only; LIMIT 50; select only needed columns.",
+    "All sessions may be searched. The '## Session' block names the current session so you can include or exclude it as the caller asks.",
+    "export-events.csx: always pass --out \"$env:TEMP\\copilot-history\\<id>.json\" and redirect stdout to $null; never write into session folders. Delete your scratch files before finishing.",
+    "Never modify session-state folders, session-store.db, project files or configuration."
+  ],
+  "CliTools": [
+    { "Name": "usql", "PathHint": "C:\\ProgramData\\chocolatey\\bin\\usql.exe", "Access": "read-only", "UseCase": "Search session-store.db. Example: `usql \"sqlite:///C:/Users/USER/.copilot/session-store.db?mode=ro\" -c \"select session_id, source_type, substr(content,1,200) from search_index where search_index match 'worktree' limit 20\" -J`." },
+    { "Name": "dotnet-script", "PathHint": "C:\\Users\\USER\\.dotnet\\tools\\dotnet-script.exe", "UseCase": "Run the session telemetry export: `dotnet script \"$HOME\\.copilot\\session-state\\scripts\\export-events.csx\" <events.jsonl> --out <temp file> > $null`." }
+  ]
+}

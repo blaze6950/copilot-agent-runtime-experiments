@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "subagentStart": [
+      {
+        "type": "command",
+        "powershell": "pwsh -NoProfile -File C:/Users/USER/.copilot/subagent-context/inject.ps1",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}

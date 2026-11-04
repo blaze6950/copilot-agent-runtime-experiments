@@ -1,0 +1,25 @@
+{
+  "Rules": [
+    "Shell discipline: this is PowerShell (pwsh), not bash. Write PowerShell syntax only and follow every rule below; they are mandatory.",
+    "Read and search with built-in tools: `view` (with view_range) for files, `grep` for content, `glob` for files by name. Never use Get-Content, Select-String, Get-ChildItem -Recurse or dir for reading or searching.",
+    "Check `$LASTEXITCODE` after every native command and report a non-zero exit code; never assume success.",
+    "PowerShell quoting: in double-quoted strings write `${var}:` (braces) before a colon, never `$var:`; never escape a quote with a backslash; double the quote or use single quotes instead.",
+    "Never leave an empty element in a pipeline: no leading, trailing or doubled `|`; every pipe element must be a command.",
+    "Bash-only commands do not exist here; never use them: cat -n, head, tail, awk, sed, wc, uniq, the shell grep command, xargs, 2>/dev/null. Use view with view_range, Select-Object -First/-Last, Measure-Object, Sort-Object -Unique, rg, ForEach-Object and 2>$null.",
+    "Cap every command's output with Select-Object -First 40 or -Last 40, or filter it first with rg or jq; never print whole files or large JSON.",
+    "If output is larger than about 20 KB, or the CLI reports it was spilled to a temp file, write it to a file (reports folder for read-only agents, %TEMP% for workers) and read it with view and view_range in chunks.",
+    "Read-only agents never write files with >, >>, Tee-Object, Set-Content, Add-Content or Out-File, except into the reports folder; `> $null` is allowed."
+  ],
+  "CliTools": [
+    { "Name": "git", "PathHint": "C:\\Program Files\\Git\\cmd\\git.exe", "UseCase": "Version control. Always use `git --no-pager`." },
+    { "Name": "rg", "PathHint": "C:\\ProgramData\\chocolatey\\bin\\rg.exe", "UseCase": "Fast recursive text/code search. Example: `rg pattern [path]`." },
+    { "Name": "fd", "PathHint": "C:\\ProgramData\\chocolatey\\bin\\fd.exe", "UseCase": "Fast file/directory search. Example: `fd pattern [path]`." },
+    { "Name": "jq", "PathHint": "C:\\ProgramData\\chocolatey\\bin\\jq.exe", "UseCase": "Parse/transform JSON. Example: `jq '.field' file.json`; put the filter in single quotes. Never use ConvertFrom-Json pipelines." },
+    { "Name": "yq", "PathHint": "C:\\ProgramData\\chocolatey\\bin\\yq.exe", "UseCase": "Parse/transform YAML/JSON. Example: `yq '.field' file.yaml`." },
+    { "Name": "curl", "PathHint": "C:\\Windows\\System32\\curl.exe", "UseCase": "HTTP requests and downloads. Example: `curl -sS <url>`, `curl -L -o out <url>`." },
+    { "Name": "tree", "PathHint": "C:\\Windows\\System32\\tree.com", "UseCase": "Directory structure. Example: `tree /F /A`." },
+    { "Name": "7z", "PathHint": "C:\\Program Files\\7-Zip\\7z.exe", "UseCase": "Create/extract/list archives. Example: `7z l archive.zip`, `7z x archive.7z`." },
+    { "Name": "gh", "PathHint": "C:\\Program Files\\GitHub CLI\\gh.exe", "UseCase": "GitHub CLI. Review threads: read them with GraphQL (`gh api graphql` with the query in single quotes; reviewThreads with isResolved and comments), not REST comment lists; put every --jq filter in single quotes. A REST reply to a review comment fails with HTTP 422 while your review is PENDING, although gh exits 0: read the HTTP status and error text, never trust the exit code alone. A reply added with GraphQL addPullRequestReviewThreadReply inside a pending review stays PENDING until that review is submitted; say so, never claim it is published. Never assume the default branch is main: look it up with `gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'`. `gh pr checks` exit code 8 means checks are pending, not a failure: re-check and report the state as pending." }
+  ]
+}
+

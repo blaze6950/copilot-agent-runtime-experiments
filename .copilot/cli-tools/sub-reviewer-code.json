@@ -1,0 +1,9 @@
+{
+  "IncludeShell": true,
+  "Rules": [ "Review only: never modify files; build/test commands are allowed for verification." ],
+  "CliTools": [
+    { "Name": "dotnet", "PathHint": "C:\\Users\\USER\\.dotnet\\dotnet.exe", "UseCase": ".NET SDK. Use `--nologo -v q` for build/test/restore to keep output terse. Always pass `--nologo -v q`; if one command fails, rerun only that command with `-v n` and filter with rg." },
+    { "Name": "ilspycmd", "PathHint": "C:\\Users\\USER\\.dotnet\\tools\\ilspycmd.exe", "UseCase": "Decompile .NET assemblies. Example: `ilspycmd -p assembly.dll`, `ilspycmd -t Namespace.Type assembly.dll`." },
+    { "Name": "map-check", "PathHint": "C:\\Users\\USER\\.copilot\\session-state\\scripts\\workflow\\map-check.ps1", "UseCase": "Validate a map document with `pwsh -NoProfile -File <path> -MapPath <map.md>`. Exit 0 is required; JSON on stdout (`ok`, `errors`, `warnings`, `stats`). Read-only." }
+  ]
+}

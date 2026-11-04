@@ -1,0 +1,12 @@
+{
+  "IncludeShell": true,
+  "Rules": [ "usql is READ-ONLY and for LOCAL files only (e.g. SQLite/agent-history.db): SELECT / FTS MATCH only. For any database server (postgres, mssql) or credentials, tell the orchestrator to use sub-expert-db." ],
+  "CliTools": [
+    { "Name": "exiftool", "PathHint": "C:\\ProgramData\\chocolatey\\bin\\exiftool.exe", "UseCase": "Read metadata of images and documents. Example: `exiftool file.jpg`." },
+    { "Name": "markitdown", "PathHint": "C:\\Users\\USER\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts\\markitdown.exe", "UseCase": "Convert pdf, docx, html, xlsx, images to Markdown to read them. Example: `markitdown <file>`." },
+    { "Name": "pandoc", "PathHint": "C:\\ProgramData\\chocolatey\\bin\\pandoc.exe", "UseCase": "Convert documents between formats. Example: `pandoc in.docx -t gfm`." },
+    { "Name": "usql", "PathHint": "C:\\ProgramData\\chocolatey\\bin\\usql.exe", "Access": "read-only", "UseCase": "Universal SQL CLI. Example: `usql \"sqlite:///C:/data/app.db\" -c \"\\dt\"`. Output: `-J` JSON, `-C` CSV, `-t` rows only." },
+    { "Name": "ilspycmd", "PathHint": "C:\\Users\\USER\\.dotnet\\tools\\ilspycmd.exe", "UseCase": "Decompile .NET assemblies. Example: `ilspycmd -p assembly.dll`, `ilspycmd -t Namespace.Type assembly.dll`." }
+  ]
+}
+

@@ -1,0 +1,18 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "PRODUCTION ONLY and STRICTLY READ-ONLY. Always pass --context \"arn:aws:eks:us-west-2:111111111111:cluster/example-prod-eks-us-west-2\" on EVERY kubectl call. Never run kubectl config use-context/set-context/delete-context.",
+    "If the prompt targets nonprod/preprod (example-preprod, 222222222222): stop and tell the orchestrator to use sub-expert-k8s-nonprod.",
+    "Allowed verbs only: get, describe, logs --tail, top, events, rollout status, auth can-i, explain, version. NEVER: apply, create, delete, patch, edit, scale, rollout restart/undo, drain, cordon, exec, cp, port-forward, label, annotate. If a change is requested, refuse and return the exact commands for a human to run.",
+    "Cap output: use `-o name`/`-o jsonpath`/`-o json | jq`, `--tail 200`, `-n <namespace>`. Never print Secret values.",
+    "If auth fails (expired AWS SSO/EKS token), report it; do not try to log in."
+  ],
+  "CliTools": [
+    {
+      "Name": "kubectl",
+      "PathHint": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe",
+      "Access": "read-only",
+      "UseCase": "Kubernetes CLI. Prod context: arn:aws:eks:us-west-2:111111111111:cluster/example-prod-eks-us-west-2. Example: kubectl --context arn:aws:eks:us-west-2:111111111111:cluster/example-prod-eks-us-west-2 -n <ns> get pods -o wide."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "CURRENT SESSION ONLY: use only the session id, session folder and events.jsonl named under '## Session'. Never read or query other sessions.",
+    "usql is READ-ONLY: open session-store.db with ?mode=ro; single SELECT / FTS MATCH statements only; every query on turns, checkpoints, search_index, session_files filters by session_id = '<current session id>'; LIMIT 50.",
+    "Never write files via the shell. All document changes go through the edit/create tools inside the current session folder.",
+    "plan-check.ps1 may be run read-only (never -SnapshotOut)."
+  ],
+  "CliTools": [
+    { "Name": "usql", "PathHint": "C:\\ProgramData\\chocolatey\\bin\\usql.exe", "Access": "read-only", "UseCase": "Query session-store.db for the current session. Example: `usql \"sqlite:///C:/Users/USER/.copilot/session-store.db?mode=ro\" -c \"select turn_index, substr(user_message,1,300) from turns where session_id='<id>' order by turn_index desc limit 20\" -J`." }
+  ]
+}

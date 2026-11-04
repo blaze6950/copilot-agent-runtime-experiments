@@ -1,0 +1,19 @@
+{
+  "codeRoles": [
+    "sub-planner-implementation",
+    "sub-worker-main",
+    "sub-worker-wt",
+    "sub-reviewer-code"
+  ],
+  "packs": [
+    { "id": "general", "file": "general.md", "markers": [] },
+    { "id": "dotnet", "file": "dotnet.md", "markers": ["*.sln", "*.slnx", "*.csproj"] }
+  ],
+  "repoInstructions": {
+    "rootFiles": ["AGENTS.md", ".github/copilot-instructions.md"],
+    "rootFilesMode": "native",
+    "githubGlob": ".github/instructions/**/*.instructions.md",
+    "githubMode": "native",
+    "maxBytes": 32768
+  }
+}

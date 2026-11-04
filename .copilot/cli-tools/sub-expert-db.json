@@ -1,0 +1,24 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "The prompt MUST contain a connection brief: engine (sqlite|postgres|mssql), target, env (nonprod|prod), auth hint, allow (read-only|read-write). If env is missing or unclear: treat as PROD read-only and stop to ask. Never guess nonprod.",
+    "Authentication: follow the brief's auth hint. If absent, look ONLY in task-relevant places (the named project's config/user-secrets, standard env vars such as PGPASSWORD/PGUSER, a Key Vault the brief names). Never scan the disk or other projects for credentials. Report which source you used, never the secret. A prod credential may be used only when the brief says env=prod.",
+    "Never put passwords in command lines or output: prefer env vars (e.g. $env:PGPASSWORD) or integrated auth over URLs with passwords. Mask passwords and PII columns in anything you return.",
+    "READ-ONLY unless the brief grants read-write via an AUTHORIZED WRITE block. Prod is always read-only. Allowed: SELECT, EXPLAIN, schema introspection. Writes: show the exact statement, run in a transaction with a WHERE, report affected rows; no DDL unless explicitly authorized.",
+    "Habits: inspect schema first (`\\d`, `\\dt`, information_schema), always cap rows (LIMIT/TOP 50), no SELECT * on large tables, use `-J` (JSON) or `-C` (CSV), and use `-c` with a single statement.",
+    "Snowflake is NOT handled here: use sub-expert-snow-nonprod / sub-expert-snow-prod.",
+    "Examples: sqlite `usql \"sqlite:///C:/path/db.sqlite?mode=ro\" -c \"\\dt\"`; postgres `usql \"postgres://user@host:5432/db?sslmode=require\" -c \"select 1\"` (password via PGPASSWORD); mssql `usql \"sqlserver://host/db?trusted_connection=yes\" -c \"select @@version\"` (or user/password via env)."
+  ],
+  "CliTools": [
+    {
+      "Name": "usql",
+      "PathHint": "C:\\ProgramData\\chocolatey\\bin\\usql.exe",
+      "UseCase": "Universal SQL CLI for SQLite, PostgreSQL, SQL Server and more. Entry point: `usql --help`. Output: `-J` JSON, `-C` CSV, `-t` rows only. Meta: `\\dt`, `\\d table`."
+    },
+    {
+      "Name": "dotnet",
+      "PathHint": "C:\\Users\\USER\\.dotnet\\dotnet.exe",
+      "UseCase": "Only for reading user-secrets when the brief says so: `dotnet user-secrets list --project <proj>`. This command accepts no quiet flags (nologo or -v), so run it exactly as written. Never print secret values in your answer."
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "ALWAYS run `ffprobe` (or `exiftool`/`magick identify`) on an input before processing it.",
+    "NEVER overwrite or delete an original: write results to a NEW file (default: same folder, suffix such as `.converted`, or the folder the prompt names). Never use `-y` against an existing file.",
+    "Long operations: use `-hide_banner -loglevel error -stats` for ffmpeg; set a generous timeout; report output path, size and duration.",
+    "yt-dlp only for content the prompt explicitly asks to download; save to the folder the prompt names (default: Downloads).",
+    "Prefer stream copy (`-c copy`) when no re-encode is needed."
+  ],
+  "CliTools": [
+    {
+      "Name": "ffmpeg",
+      "PathHint": "C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe",
+      "UseCase": "Audio/video conversion and processing. Example: `ffmpeg -hide_banner -i in.mp4 -c:v libx264 -crf 23 out.mp4`, `ffmpeg -i in.mp4 -vn -c:a libmp3lame out.mp3`."
+    },
+    {
+      "Name": "ffprobe",
+      "PathHint": "C:\\ProgramData\\chocolatey\\bin\\ffprobe.exe",
+      "UseCase": "Inspect media streams/metadata. Example: `ffprobe -v error -show_format -show_streams -of json file`."
+    },
+    {
+      "Name": "magick",
+      "PathHint": "C:\\Program Files\\ImageMagick-7.1.2-Q16-HDRI\\magick.exe",
+      "UseCase": "Image conversion and manipulation. Example: `magick in.png -resize 50% out.png`, `magick identify file`."
+    },
+    {
+      "Name": "exiftool",
+      "PathHint": "C:\\ProgramData\\chocolatey\\bin\\exiftool.exe",
+      "UseCase": "Read/write metadata. Example: `exiftool file.jpg`. Use `-overwrite_original` only when the prompt authorizes metadata edits in place."
+    },
+    {
+      "Name": "yt-dlp",
+      "PathHint": "C:\\ProgramData\\chocolatey\\bin\\yt-dlp.exe",
+      "UseCase": "Download audio/video. Example: `yt-dlp -f best <url>`, `yt-dlp -x --audio-format mp3 <url>`."
+    },
+    {
+      "Name": "markitdown",
+      "PathHint": "C:\\Users\\USER\\AppData\\Local\\Python\\pythoncore-3.14-64\\Scripts\\markitdown.exe",
+      "UseCase": "Convert documents/images to Markdown. Example: `markitdown <file>`."
+    },
+    {
+      "Name": "pandoc",
+      "PathHint": "C:\\ProgramData\\chocolatey\\bin\\pandoc.exe",
+      "UseCase": "Convert documents between formats. Example: `pandoc in.docx -t gfm`, `pandoc in.md -o out.pdf`."
+    }
+  ]
+}

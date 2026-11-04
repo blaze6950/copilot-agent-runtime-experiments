@@ -1,0 +1,17 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "PRODUCTION ONLY and STRICTLY READ-ONLY. ALWAYS pass `-c example_prod` explicitly. If the prompt targets nonprod, stop and tell the orchestrator to use sub-expert-snow-nonprod.",
+    "Only SELECT/SHOW/DESCRIBE/EXPLAIN with LIMIT. Refuse any DML/DDL/GRANT, and return the statement for a human to run instead. No `SELECT *` on large tables; avoid long-running scans and respect warehouse cost.",
+    "Authentication uses an external-browser SSO login: a snow call may open a browser and wait. Do NOT run `snow connection list/test`; it triggers a login. If a call hangs or asks for login, stop and tell the orchestrator.",
+    "Use `--format json`; mask or omit PII columns."
+  ],
+  "CliTools": [
+    {
+      "Name": "snow",
+      "PathHint": "C:\\Program Files\\Snowflake CLI\\snow.exe",
+      "Access": "read-only",
+      "UseCase": "Snowflake CLI. Example: `snow -c example_prod sql -q \"select current_role()\"`. Connection: example_prod (EXAMPLE-PROD, role PUBLIC)."
+    }
+  ]
+}

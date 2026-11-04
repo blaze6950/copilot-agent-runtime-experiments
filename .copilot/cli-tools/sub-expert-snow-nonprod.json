@@ -1,0 +1,16 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "NON-PRODUCTION ONLY. ALWAYS pass `-c example_nonprod` explicitly (the default connection is example_prod!). If the prompt targets prod, stop and tell the orchestrator to use sub-expert-snow-prod.",
+    "Default to SELECT/SHOW/DESCRIBE with LIMIT. DML/DDL (INSERT, UPDATE, DELETE, MERGE, CREATE, ALTER, DROP, TRUNCATE, GRANT) only with an AUTHORIZED WRITE block showing the exact statement; wrap in a transaction where possible and report affected rows.",
+    "Authentication uses an external-browser SSO login: a snow call may open a browser and wait. Do NOT run `snow connection list/test`; it triggers a login. If a call hangs or asks for login, stop and tell the orchestrator.",
+    "Use `--format json` and cap rows; do not print PII columns in full."
+  ],
+  "CliTools": [
+    {
+      "Name": "snow",
+      "PathHint": "C:\\Program Files\\Snowflake CLI\\snow.exe",
+      "UseCase": "Snowflake CLI. Example: `snow -c example_nonprod sql -q \"select current_role(), current_warehouse()\"`. Connection: example_nonprod (EXAMPLE-NONPROD, role PUBLIC)."
+    }
+  ]
+}

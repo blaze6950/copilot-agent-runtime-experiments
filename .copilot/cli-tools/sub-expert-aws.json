@@ -1,0 +1,16 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "READ-ONLY: describe/list/get verbs only. Never create, put, update, delete, terminate, run-instances, invoke or modify anything; never run `aws configure`/`sso login`.",
+    "Profile `default` only exists. Pass `--profile default --region us-west-2` explicitly unless told otherwise. Verify the account first with `aws sts get-caller-identity` and state it in your answer (known accounts: 111111111111 = PROD, 222222222222 = PREPROD/nonprod). Treat prod as extra sensitive: summarize, do not enumerate everything.",
+    "Always use `--output json` + `--query` or jq; never print secrets (no `secretsmanager get-secret-value`, no `ssm get-parameter --with-decryption`)."
+  ],
+  "CliTools": [
+    {
+      "Name": "aws",
+      "PathHint": "C:\\Program Files\\Amazon\\AWSCLIV2\\aws.exe",
+      "Access": "read-only",
+      "UseCase": "AWS CLI. Example: `aws sts get-caller-identity`, `aws ec2 describe-instances --query ...`, `aws s3 ls`."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "powershell": "pwsh -NoProfile -File C:/Users/USER/.copilot/env-context/inject-env.ps1",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}

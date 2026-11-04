@@ -1,0 +1,8 @@
+{
+  "IncludeShell": true,
+  "Rules": [ "AGENT-RULE-MARKER read only." ],
+  "CliTools": [
+    { "Name": "pwsh", "UseCase": "FIXTURE-PWSH-USE shell." },
+    { "Name": "definitely-not-installed-tool-xyz", "UseCase": "FIXTURE-MISSING-USE." }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "STRICTLY READ-ONLY on all data. usql: open session-store.db with ?mode=ro; single SELECT statements only; LIMIT 50; select only needed columns.",
+    "Write ONLY under C:\\Users\\USER\\.copilot\\reports\\ (create the folder if missing). The single exception is export.json, which export-events.csx writes beside events.jsonl, and only when it is missing, older than events.jsonl, or reported stale by session-metrics.csx (exit 2).",
+    "Never modify session-state folders (other than that export.json), session-store.db, agents, skills, docs, scripts or configuration.",
+    "Never open mcp-secrets/, mcp-oauth-config/, entra-broker-*, token or login values in config.json, or URLs and headers in mcp-config.json.",
+    "Never dispatch sub-agents and never look up or compute prices: cost comes only from the script output (costUsd)."
+  ],
+  "CliTools": [
+    { "Name": "dotnet-script", "PathHint": "C:\\Users\\USER\\.dotnet\\tools\\dotnet-script.exe", "UseCase": "Run the telemetry scripts: `dotnet script \"$HOME\\.copilot\\session-state\\scripts\\export-events.csx\" <events.jsonl> --out <export.json>`, `session-metrics.csx` (schema v2 metrics), then `render-dashboard.csx` (no `--pricing`: the cost comes from `costUsd`)." },
+    { "Name": "jq", "PathHint": "C:\\ProgramData\\chocolatey\\bin\\jq.exe", "UseCase": "Query export.json, metrics and findings files. Example: `jq -c '[.subagentDispatches[] | select(.status != \"completed\") | .label]' export.json`." },
+    { "Name": "usql", "PathHint": "C:\\ProgramData\\chocolatey\\bin\\usql.exe", "Access": "read-only", "UseCase": "Query session-store.db (sqlite3 is not installed). Example: `usql \"sqlite:///C:/Users/USER/.copilot/session-store.db?mode=ro\" -c \"select id, cwd, created_at from sessions order by created_at desc limit 20\" -J`." },
+    { "Name": "pwsh", "PathHint": "C:\\Users\\USER\\AppData\\Local\\Microsoft\\WindowsApps\\Microsoft.PowerShell_8wekyb3d8bbwe\\pwsh.exe", "UseCase": "Run the setup audit: `pwsh -NoProfile -File \"$HOME\\.copilot\\session-state\\scripts\\workflow\\setup-check.ps1\"` (prints JSON) and open the dashboard with `Start-Process`." }
+  ]
+}

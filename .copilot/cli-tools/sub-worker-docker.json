@@ -1,0 +1,16 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "Always use `--format`/`--tail`/`--no-trunc` style flags and cap output; never dump full build or container logs.",
+    "Inspecting (ps, images, logs, inspect, stats, compose ps/config) is always fine. Starting/stopping/building/compose up-down of what the prompt names is fine.",
+    "Destructive commands (rm, rmi, volume rm, network rm, system/image/container/volume prune, compose down -v, kill) need an AUTHORIZED block listing the exact targets. Never run any `prune` without one.",
+    "Never mount host system directories or run `--privileged` unless the prompt says so explicitly."
+  ],
+  "CliTools": [
+    {
+      "Name": "docker",
+      "PathHint": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe",
+      "UseCase": "Containers, images, compose stacks. Example: `docker ps --format '{{.Names}} {{.Status}}'`, `docker logs --tail 200 <c>`, `docker compose ps`."
+    }
+  ]
+}

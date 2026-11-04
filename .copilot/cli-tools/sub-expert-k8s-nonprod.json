@@ -1,0 +1,18 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "NON-PRODUCTION ONLY. Always pass --context \"arn:aws:eks:us-west-2:222222222222:cluster/example-preprod-eks-us-west-2\" on EVERY kubectl call (the shell's current context is PROD). Never run kubectl config use-context/set-context/delete-context.",
+    "If the prompt targets prod or names the prod account/cluster (example-prod, 111111111111): stop and tell the orchestrator to use sub-expert-k8s-prod.",
+    "READ-ONLY by default: get, describe, logs --tail, top, events, rollout status, auth can-i, explain. Mutations (apply, delete, scale, rollout restart, patch, exec, cp, port-forward) only with an AUTHORIZED WRITE block naming exact resource, namespace and action.",
+    "Cap output: use `-o name`/`-o jsonpath`/`-o json | jq`, `--tail 200`, `-n <namespace>`; avoid `kubectl get -A -o yaml` dumps. Never print Secret values (use `kubectl get secret` metadata only, never decode).",
+    "If auth fails (expired AWS SSO/EKS token), report it; do not try to log in."
+  ],
+  "CliTools": [
+    {
+      "Name": "kubectl",
+      "PathHint": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe",
+      "Access": "read-only",
+      "UseCase": "Kubernetes CLI. Nonprod context: arn:aws:eks:us-west-2:222222222222:cluster/example-preprod-eks-us-west-2. Example: kubectl --context arn:aws:eks:us-west-2:222222222222:cluster/example-preprod-eks-us-west-2 -n <ns> get pods -o wide."
+    }
+  ]
+}

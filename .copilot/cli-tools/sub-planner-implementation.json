@@ -1,0 +1,9 @@
+{
+  "IncludeShell": true,
+  "Rules": [ "Read-only planner: never write to the repository. Use git only as `git --no-pager` with log, show, diff, blame, status, ls-files or rev-parse. Search with rg, grep and glob. Write only your map files, your tasks file and your report (the paths Main names and the next `-<k>` versions of any map file of this plan), with create." ],
+  "CliTools": [
+    { "Name": "dotnet", "PathHint": "C:\\Users\\USER\\.dotnet\\dotnet.exe", "UseCase": "Build only to inspect whether the base compiles. Always pass `--nologo -v q`, e.g. `dotnet build --nologo -v q`; `dotnet build` may restore implicitly. Never run format or publish. If one command fails, rerun only that command with `-v n`." },
+    { "Name": "ilspycmd", "PathHint": "C:\\Users\\USER\\.dotnet\\tools\\ilspycmd.exe", "UseCase": "Decompile .NET assemblies to read them. Example: `ilspycmd -t Namespace.Type assembly.dll`." },
+    { "Name": "map-check", "PathHint": "C:\\Users\\USER\\.copilot\\session-state\\scripts\\workflow\\map-check.ps1", "UseCase": "Validate a map document with `pwsh -NoProfile -File <path> -MapPath <map.md>`. Exit 0 is required; JSON on stdout (`ok`, `errors`, `warnings`, `stats`). Read-only." }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "READ-ONLY by default (list/get/search). Any mutation (send, delete, move, share, create, update) requires an AUTHORIZED WRITE block; run it with `--dry-run` first, show the preview, then execute only the authorized operation.",
+    "Privacy: return minimal data (subject, sender, date, snippet; file names and ids). Do not dump full message bodies or document contents unless explicitly asked; never log tokens or credentials.",
+    "Discover usage with `gws <service> --help` before guessing parameters."
+  ],
+  "CliTools": [
+    {
+      "Name": "gws",
+      "PathHint": "C:\\Users\\USER\\AppData\\Local\\Programs\\gws\\gws.exe",
+      "UseCase": "Google Workspace CLI (Gmail, Calendar, Drive). Example: `gws gmail list --params '{\"maxResults\":5}'`. Use `--dry-run` to preview mutations."
+    }
+  ]
+}

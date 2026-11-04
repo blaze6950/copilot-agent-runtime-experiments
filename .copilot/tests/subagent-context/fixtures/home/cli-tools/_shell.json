@@ -1,0 +1,6 @@
+{
+  "Rules": [ "SHELL-RULE-MARKER keep output terse." ],
+  "CliTools": [
+    { "Name": "git", "UseCase": "FIXTURE-GIT-USE version control." }
+  ]
+}

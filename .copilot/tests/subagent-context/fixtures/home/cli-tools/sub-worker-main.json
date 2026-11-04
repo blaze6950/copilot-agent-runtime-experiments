@@ -1,0 +1,6 @@
+{
+  "IncludeShell": false,
+  "CliTools": [
+    { "Name": "pwsh", "UseCase": "FIXTURE-WORKER-PWSH-USE shell." }
+  ]
+}

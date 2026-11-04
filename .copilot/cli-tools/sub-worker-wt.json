@@ -1,0 +1,10 @@
+{
+  "IncludeShell": true,
+  "Rules": [ "Do not use cloud/cluster CLIs (kubectl, az, aws, snow, hcloud); ask the orchestrator to delegate to the matching specialist." ],
+  "CliTools": [
+    { "Name": "dotnet", "PathHint": "C:\\Users\\USER\\.dotnet\\dotnet.exe", "UseCase": ".NET SDK. Use `--nologo -v q` for build/test/restore to keep output terse. Always pass `--nologo -v q`; if one command fails, rerun only that command with `-v n` and filter with rg." },
+    { "Name": "node", "PathHint": "C:\\nvm\\nodejs\\node.exe", "UseCase": "Run JavaScript/Node.js scripts. Example: `node script.js`." },
+    { "Name": "npm", "PathHint": "C:\\nvm\\nodejs\\npm.cmd", "UseCase": "JavaScript packages. Example: `npm install`, `npm run <script>`. Install only after manifest changes or missing-dependency failures." },
+    { "Name": "dotnet-script", "PathHint": "C:\\Users\\USER\\.dotnet\\tools\\dotnet-script.exe", "UseCase": "Run existing C# .csx scripts. Example: `dotnet script file.csx`." }
+  ]
+}

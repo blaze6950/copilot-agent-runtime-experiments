@@ -1,0 +1,16 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "Context: `hcloud context list` (active: hetzner). Do not run `hcloud context use/create/delete`.",
+    "READ-ONLY: only list/describe verbs (server, network, volume, firewall, ssh-key, image, load-balancer, floating-ip). Never create, delete, rebuild, power off/reset, attach/detach or change firewall rules unless the prompt has an AUTHORIZED WRITE block naming the exact resource.",
+    "Prefer `-o json` and filter with jq."
+  ],
+  "CliTools": [
+    {
+      "Name": "hcloud",
+      "PathHint": "C:\\Users\\USER\\AppData\\Local\\Programs\\hcloud\\hcloud.exe",
+      "Access": "read-only",
+      "UseCase": "Hetzner Cloud CLI. Example: `hcloud server list -o json`, `hcloud server describe <name>`, `hcloud firewall list`."
+    }
+  ]
+}

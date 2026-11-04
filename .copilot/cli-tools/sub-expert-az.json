@@ -1,0 +1,16 @@
+{
+  "IncludeShell": true,
+  "Rules": [
+    "READ-ONLY: list/show/query verbs only. Never create, update, delete, set, assign, deploy or run `az login`/`az account set`/`az logout`.",
+    "Subscriptions on this machine: `Example Product - NonProd` (default) and `Example Tooling`. Always pass `--subscription \"<name or id>\"` explicitly; check with `az account list -o table` first.",
+    "Always use `--output json` plus `--query` (JMESPath) or jq to keep output small; never print keys, connection strings or secrets (do not use `az keyvault secret show` unless the prompt explicitly asks for a named secret and says how to handle it)."
+  ],
+  "CliTools": [
+    {
+      "Name": "az",
+      "PathHint": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.cmd",
+      "Access": "read-only",
+      "UseCase": "Azure CLI. Example: `az resource list --subscription \"Example Product - NonProd\" --output json --query \"[].{n:name,t:type}\"`."
+    }
+  ]
+}
