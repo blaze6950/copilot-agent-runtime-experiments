@@ -1,0 +1,43 @@
+{
+  "sessionId": "sess-v2-overlap",
+  "sessionStart": "2026-06-03T12:00:00Z",
+  "sessionEnd": "2026-06-03T12:10:00Z",
+  "durationMs": 600000,
+  "shutdownType": "normal",
+  "segmentCount": 1,
+  "cwd": "C:\\synthetic\\project-overlap",
+  "copilotVersion": "1.0.3-test",
+  "totalPremiumRequests": 0,
+  "totalApiDurationMs": 0,
+  "errorCount": 0,
+  "errors": [],
+  "eventTypeCounts": { "user.message": 1 },
+  "modelChanges": [],
+  "compactionEvents": [],
+  "segments": [],
+  "costUsd": 0.11,
+  "compactionCostUsd": 0,
+  "sourceEventCount": 8,
+  "requests": [
+    { "timestamp": "2026-06-03T12:01:03.000Z", "agentId": "agent-B", "model": "claude-haiku-5.5", "inputTokens": 50, "outputTokens": 5, "cacheReadTokens": 0, "cacheWriteTokens": 0, "durationMs": 500, "totalNanoAiu": 5000000000, "kind": null },
+    { "timestamp": "2026-06-03T12:01:04.000Z", "agentId": "agent-A", "model": "claude-haiku-5.5", "inputTokens": 60, "outputTokens": 6, "cacheReadTokens": 0, "cacheWriteTokens": 0, "durationMs": 600, "totalNanoAiu": 6000000000, "kind": null }
+  ],
+  "hookWindows": [],
+  "toolStats": [],
+  "subagentDispatches": [
+    { "label": "sub-explorer-code #1", "agentName": "sub-explorer-code", "callId": "call-A", "agentId": "agent-A", "status": "completed", "model": "claude-haiku-5.5", "startTs": "2026-06-03T12:01:01.000Z", "endTs": "2026-06-03T12:01:05.000Z", "durationMs": 4000.0, "toolCallCount": 0, "totalTokens": 66, "tools": [] },
+    { "label": "sub-expert-ado #1", "agentName": "sub-expert-ado", "callId": "call-B", "agentId": "agent-B", "status": "completed", "model": "claude-haiku-5.5", "startTs": "2026-06-03T12:01:02.000Z", "endTs": "2026-06-03T12:01:06.000Z", "durationMs": 4000.0, "toolCallCount": 0, "totalTokens": 55, "tools": [] }
+  ],
+  "timeline": {
+    "lanes": [
+      {
+        "laneId": "orchestrator",
+        "label": "ORCHESTRATOR",
+        "events": [
+          { "ts": "2026-06-03T12:00:00.000Z", "deltaMs": 0.0, "displayType": "session.start", "annotation": "synthetic" },
+          { "ts": "2026-06-03T12:00:30.000Z", "deltaMs": 30000.0, "displayType": "user.message", "contentSnippet": "synthetic user turn" }
+        ]
+      }
+    ]
+  }
+}

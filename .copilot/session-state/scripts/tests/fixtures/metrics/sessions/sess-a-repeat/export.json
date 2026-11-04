@@ -1,0 +1,115 @@
+{
+  "sessionId": "sess-a-repeat",
+  "sessionStart": "2026-05-01T10:00:00Z",
+  "sessionEnd": "2026-05-01T11:00:00Z",
+  "durationMs": 3600000,
+  "shutdownType": "normal",
+  "segmentCount": 1,
+  "cwd": "C:\\synthetic\\project-a",
+  "copilotVersion": "1.0.0-test",
+  "totalPremiumRequests": 3,
+  "totalApiDurationMs": 60000,
+  "currentTokens": 42000,
+  "errorCount": 1,
+  "errors": [
+    { "ts": "2026-05-01T10:05:00Z", "type": "tool.execution_complete", "scope": "subagent", "detail": "synthetic failure" }
+  ],
+  "eventTypeCounts": { "user.message": 2, "tool": 6 },
+  "modelChanges": [],
+  "compactionEvents": [
+    { "ts": "2026-05-01T10:40:00Z", "tokensBefore": 150000, "tokensAfter": 40000 }
+  ],
+  "modelMetrics": {
+    "claude-sonnet-4.6": { "requests": 5, "cost": 1.0, "inputTokens": 1000, "outputTokens": 300, "cacheReadTokens": 900, "cacheWriteTokens": 100, "reasoningTokens": null },
+        "claude-haiku-4.5": { "requests": 2, "cost": 0.0, "inputTokens": 500, "outputTokens": 50, "cacheReadTokens": 100, "cacheWriteTokens": 0, "reasoningTokens": null }
+  },
+  "toolStats": [
+    { "name": "read", "calls": 5, "successes": 5, "avgDurationMs": 100.0, "minDurationMs": 10.0, "maxDurationMs": 200.0 },
+    { "name": "edit", "calls": 1, "successes": 0, "avgDurationMs": 50.0, "minDurationMs": 50.0, "maxDurationMs": 50.0 }
+  ],
+  "subagentDispatches": [
+    {
+      "label": "sub-explorer-code #1",
+      "agentName": "sub-explorer-code",
+      "callId": "call-a1",
+      "status": "completed",
+      "model": "claude-haiku-4.5",
+      "startTs": "2026-05-01T10:00:10.000Z",
+      "endTs": "2026-05-01T10:00:11.000Z",
+      "durationMs": 1000.0,
+      "inputTokens": 800,
+      "outputTokens": 200,
+      "totalTokens": 1000,
+      "toolCallCount": 2,
+      "tools": [ { "name": "read", "count": 2 } ],
+      "prompt": "synthetic prompt 1",
+      "answer": "synthetic answer 1"
+    },
+    {
+      "label": "sub-explorer-code #2",
+      "agentName": "sub-explorer-code",
+      "callId": "call-a2",
+      "status": "completed",
+      "model": "claude-haiku-4.5",
+      "startTs": "2026-05-01T10:00:20.000Z",
+      "endTs": "2026-05-01T10:00:22.000Z",
+      "durationMs": 2000.0,
+      "inputTokens": 1200,
+      "outputTokens": 300,
+      "totalTokens": 1500,
+      "toolCallCount": 3,
+      "tools": [ { "name": "read", "count": 3 } ],
+      "prompt": "synthetic prompt 2",
+      "answer": "synthetic answer 2"
+    },
+    {
+      "label": "sub-worker-wt #1",
+      "agentName": "sub-worker-wt",
+      "callId": "call-a3",
+      "status": "failed",
+      "model": "claude-haiku-4.5",
+      "startTs": "2026-05-01T10:05:00.000Z",
+      "endTs": "2026-05-01T10:05:00.500Z",
+      "durationMs": 500.0,
+      "inputTokens": 250,
+      "outputTokens": 50,
+      "totalTokens": 300,
+      "toolCallCount": 1,
+      "tools": [ { "name": "edit", "count": 1 } ],
+      "prompt": "synthetic prompt 3",
+      "answer": "synthetic answer 3",
+      "error": "synthetic failure"
+    },
+    {
+      "label": "sub-explorer-code #3",
+      "agentName": "sub-explorer-code",
+      "callId": "call-a4",
+      "status": "completed",
+      "model": "claude-haiku-4.5",
+      "startTs": "2026-05-01T10:35:00.000Z",
+      "endTs": "2026-05-01T10:35:03.000Z",
+      "durationMs": 3000.0,
+      "inputTokens": 1500,
+      "outputTokens": 500,
+      "totalTokens": 2000,
+      "toolCallCount": 4,
+      "tools": [],
+      "prompt": "synthetic prompt 4",
+      "answer": "synthetic answer 4"
+    }
+  ],
+  "timeline": {
+    "lanes": [
+      {
+        "laneId": "orchestrator",
+        "label": "ORCHESTRATOR",
+        "events": [
+          { "ts": "2026-05-01T10:00:00.000Z", "deltaMs": 0.0, "displayType": "session.start", "annotation": "synthetic" },
+          { "ts": "2026-05-01T10:00:01.000Z", "deltaMs": 1000.0, "displayType": "user.message", "contentSnippet": "synthetic user turn 1" },
+          { "ts": "2026-05-01T10:00:30.000Z", "deltaMs": 29000.0, "displayType": "tool", "toolName": "read", "toolSuccess": true, "durationMs": 40.0, "merged": true },
+          { "ts": "2026-05-01T10:30:00.000Z", "deltaMs": 1770000.0, "displayType": "user.message", "contentSnippet": "synthetic user turn 2" }
+        ]
+      }
+    ]
+  }
+}

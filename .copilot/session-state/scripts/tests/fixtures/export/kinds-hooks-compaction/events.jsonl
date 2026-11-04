@@ -1,0 +1,16 @@
+{"type":"session.start","id":"e01","timestamp":"2026-10-03T10:00:00.000Z","parentId":null,"data":{"sessionId":"fx-kinds","copilotVersion":"1.0.98","context":{"cwd":"C:\\synthetic\\fx"}}}
+{"type":"session.usage_record","id":"e02","timestamp":"2026-10-03T10:00:01.000Z","parentId":"e01","data":{"usage":{"model":"claude-opus-5.5","inputTokens":100,"outputTokens":10,"cacheReadTokens":40,"cacheWriteTokens":50,"reasoningTokens":0,"cost":1.0,"duration":1000,"initiator":"user","copilotUsage":{"totalNanoAiu":10000000000}}}}
+{"type":"user.message","id":"e03","timestamp":"2026-10-03T10:00:02.000Z","parentId":"e02","data":{"content":"do the thing"}}
+{"type":"hook.start","id":"e04","timestamp":"2026-10-03T10:00:03.000Z","parentId":"e03","data":{"hookInvocationId":"h1","hookType":"preToolUse"}}
+{"type":"hook.end","id":"e05","timestamp":"2026-10-03T10:00:03.250Z","parentId":"e04","data":{"hookInvocationId":"h1","hookType":"preToolUse","success":true}}
+{"type":"session.usage_record","id":"e06","timestamp":"2026-10-03T10:00:04.000Z","parentId":"e05","data":{"usage":{"model":"claude-opus-5.5","inputTokens":200,"outputTokens":20,"cacheReadTokens":100,"cacheWriteTokens":80,"reasoningTokens":0,"cost":1.0,"duration":2000,"initiator":"user","copilotUsage":{"totalNanoAiu":20000000000}}}}
+{"type":"session.usage_record","id":"e07","timestamp":"2026-10-03T10:00:05.000Z","parentId":"e06","agentId":"agent-7","data":{"usage":{"model":"claude-haiku-5.5","inputTokens":50,"outputTokens":5,"cacheReadTokens":0,"cacheWriteTokens":0,"reasoningTokens":0,"cost":0.0,"duration":500,"initiator":"sub-agent","copilotUsage":{"totalNanoAiu":5000000000}}}}
+{"type":"hook.start","id":"e08","timestamp":"2026-10-03T10:00:06.000Z","parentId":"e07","agentId":"agent-7","data":{"hookInvocationId":"h2","hookType":"preToolUse"}}
+{"type":"hook.end","id":"e09","timestamp":"2026-10-03T10:00:06.100Z","parentId":"e08","agentId":"agent-7","data":{"hookInvocationId":"h2","hookType":"preToolUse","success":true}}
+{"type":"hook.start","id":"e10","timestamp":"2026-10-03T10:00:07.000Z","parentId":"e09","data":{"hookInvocationId":"h3","hookType":"postToolUse"}}
+{"type":"hook.end","id":"e11","timestamp":"2026-10-03T10:00:07.050Z","parentId":"e10","data":{"hookInvocationId":"h3","hookType":"postToolUse","success":true}}
+{"type":"hook.start","id":"e12","timestamp":"2026-10-03T10:00:08.000Z","parentId":"e11","data":{"hookInvocationId":"h4","hookType":"preToolUse"}}
+{"type":"user.message","id":"e13","timestamp":"2026-10-03T10:00:09.000Z","parentId":"e12","data":{"content":"[keepalive] Automatic prompt-cache keep-alive"}}
+{"type":"user.message","id":"e14","timestamp":"2026-10-03T10:00:09.500Z","parentId":"e13","agentId":"agent-7","data":{"content":"task: sub-agent prompt"}}
+{"type":"session.usage_record","id":"e15","timestamp":"2026-10-03T10:00:10.000Z","parentId":"e14","data":{"usage":{"model":"claude-opus-5.5","inputTokens":300,"outputTokens":30,"cacheReadTokens":250,"cacheWriteTokens":20,"reasoningTokens":0,"cost":1.0,"duration":3000,"initiator":"user","copilotUsage":{"totalNanoAiu":30000000000}}}}
+{"type":"session.compaction_complete","id":"e16","timestamp":"2026-10-03T10:00:11.000Z","parentId":"e15","data":{"preCompactionTokens":1000,"compactionTokensUsed":{"copilotUsage":{"totalNanoAiu":50000000000}}}}

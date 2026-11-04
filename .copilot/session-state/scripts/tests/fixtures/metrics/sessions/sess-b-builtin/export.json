@@ -1,0 +1,160 @@
+{
+  "sessionId": "sess-b-builtin",
+  "sessionStart": "2026-05-02T09:00:00Z",
+  "sessionEnd": "2026-05-02T09:30:00Z",
+  "durationMs": 1800000,
+  "shutdownType": "normal",
+  "segmentCount": 1,
+  "cwd": "C:\\synthetic\\project-b",
+  "copilotVersion": "1.0.1-test",
+  "totalPremiumRequests": 1,
+  "totalApiDurationMs": 20000,
+  "currentTokens": 52000,
+  "errorCount": 0,
+  "errors": [],
+  "eventTypeCounts": { "user.message": 1, "tool": 7 },
+  "modelChanges": [],
+  "compactionEvents": [],
+  "modelMetrics": {
+    "claude-opus-4.6": { "requests": 3, "cost": 2.0, "inputTokens": 1000, "outputTokens": 900, "cacheReadTokens": 900, "cacheWriteTokens": 100, "reasoningTokens": null }
+  },
+  "toolStats": [
+    { "name": "view", "calls": 2, "successes": 2, "avgDurationMs": 30.0, "minDurationMs": 10.0, "maxDurationMs": 50.0 },
+    { "name": "grep", "calls": 2, "successes": 2, "avgDurationMs": 60.0, "minDurationMs": 20.0, "maxDurationMs": 90.0 },
+    { "name": "edit", "calls": 1, "successes": 1, "avgDurationMs": 25.0, "minDurationMs": 25.0, "maxDurationMs": 25.0 },
+    { "name": "write_agent", "calls": 2, "successes": 2, "avgDurationMs": 5.0, "minDurationMs": 4.0, "maxDurationMs": 6.0 }
+  ],
+  "subagentDispatches": [
+    {
+      "label": "explore #1",
+      "agentName": "explore",
+      "callId": "call-b1",
+      "status": "completed",
+      "model": "claude-haiku-4.5",
+      "startTs": "2026-05-02T09:01:00.000Z",
+      "endTs": "2026-05-02T09:01:04.000Z",
+      "durationMs": 4000.0,
+      "inputTokens": 1500,
+      "outputTokens": 500,
+      "totalTokens": 2000,
+      "toolCallCount": 4,
+      "tools": [ { "name": "grep", "count": 2 }, { "name": "view", "count": 2 } ],
+      "prompt": "synthetic prompt b1",
+      "answer": "synthetic answer b1"
+    },
+    {
+      "label": "sub-explorer-code #1",
+      "agentName": "sub-explorer-code",
+      "callId": "call-b2",
+      "status": "completed",
+      "model": "claude-haiku-4.5",
+      "startTs": "2026-05-02T09:05:00.000Z",
+      "endTs": "2026-05-02T09:05:06.000Z",
+      "durationMs": 6000.0,
+      "inputTokens": 2000,
+      "outputTokens": 1000,
+      "totalTokens": 3000,
+      "toolCallCount": 5,
+      "tools": [ { "name": "read", "count": 3 }, { "name": "edit", "count": 1 } ],
+      "prompt": "synthetic prompt b2",
+      "answer": "synthetic answer b2"
+    },
+    {
+      "label": "sub-expert-ado-writer #1",
+      "agentName": "sub-expert-ado-writer",
+      "callId": "call-b3",
+      "status": "completed",
+      "model": "claude-haiku-4.5",
+      "startTs": "2026-05-02T09:10:00.000Z",
+      "endTs": "2026-05-02T09:10:01.000Z",
+      "durationMs": 1000.0,
+      "inputTokens": 300,
+      "outputTokens": 200,
+      "totalTokens": 500,
+      "toolCallCount": 1,
+      "tools": [ { "name": "create", "count": 1 } ],
+      "prompt": "synthetic prompt b3",
+      "answer": "synthetic answer b3"
+    },
+    {
+      "label": "sub-explorer #1",
+      "agentName": "sub-explorer",
+      "callId": "call-b4",
+      "status": "completed",
+      "model": "claude-haiku-4.5",
+      "startTs": "2026-05-02T09:12:00.000Z",
+      "endTs": "2026-05-02T09:12:02.000Z",
+      "durationMs": 2000.0,
+      "inputTokens": 100,
+      "outputTokens": 50,
+      "totalTokens": 150,
+      "toolCallCount": 1,
+      "tools": [ { "name": "edit", "count": 1 } ],
+      "prompt": "synthetic prompt b4",
+      "answer": "synthetic answer b4"
+    },
+    {
+      "label": "sub-debugger #1",
+      "agentName": "sub-debugger",
+      "callId": "call-b5",
+      "status": "completed",
+      "model": "claude-haiku-4.5",
+      "startTs": "2026-05-02T09:14:00.000Z",
+      "endTs": "2026-05-02T09:14:03.000Z",
+      "durationMs": 3000.0,
+      "inputTokens": 200,
+      "outputTokens": 100,
+      "totalTokens": 300,
+      "toolCallCount": 2,
+      "tools": [ { "name": "edit", "count": 1 } ],
+      "prompt": "synthetic prompt b5",
+      "answer": "synthetic answer b5"
+    },
+    {
+      "label": "sub-researcher-ado #1",
+      "agentName": "sub-researcher-ado",
+      "callId": "call-b6",
+      "status": "completed",
+      "model": "claude-haiku-4.5",
+      "startTs": "2026-05-02T09:16:00.000Z",
+      "endTs": "2026-05-02T09:16:01.000Z",
+      "durationMs": 1000.0,
+      "inputTokens": 100,
+      "outputTokens": 50,
+      "totalTokens": 150,
+      "toolCallCount": 1,
+      "tools": [ { "name": "edit", "count": 1 } ],
+      "prompt": "synthetic prompt b6",
+      "answer": "synthetic answer b6"
+    },
+    {
+      "label": "sub-writer-ado #1",
+      "agentName": "sub-writer-ado",
+      "callId": "call-b7",
+      "status": "completed",
+      "model": "claude-haiku-4.5",
+      "startTs": "2026-05-02T09:18:00.000Z",
+      "endTs": "2026-05-02T09:18:01.000Z",
+      "durationMs": 1000.0,
+      "inputTokens": 100,
+      "outputTokens": 50,
+      "totalTokens": 150,
+      "toolCallCount": 1,
+      "tools": [ { "name": "edit", "count": 1 } ],
+      "prompt": "synthetic prompt b7",
+      "answer": "synthetic answer b7"
+    }
+  ],
+  "timeline": {
+    "lanes": [
+      {
+        "laneId": "orchestrator",
+        "label": "ORCHESTRATOR",
+        "events": [
+          { "ts": "2026-05-02T09:00:00.000Z", "deltaMs": 0.0, "displayType": "session.start", "annotation": "synthetic" },
+          { "ts": "2026-05-02T09:00:05.000Z", "deltaMs": 5000.0, "displayType": "user.message", "contentSnippet": "synthetic user turn 1" }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-18T09:00:00Z",
+  "source": "fixture: one session whose inputTokens include cache read and cache write (T22-fix1)",
+  "sessions": [
+    {"sessionId":"cc01","startTime":"2026-09-07T09:00:00+02:00","endTime":"2026-09-07T10:00:00+02:00","cwd":"C:\\repos\\delta","gitRoot":null,"copilotVersion":"1.0.98","durationMs":3600000,"userTurns":2,"premiumRequests":1,"models":[{"model":"model-a","requests":1,"inputTokens":1000000,"outputTokens":100000,"cacheReadTokens":600000,"cacheWriteTokens":200000}],"cacheReadRatio":0.6,"compactions":0,"peakContextTokens":50000,"errors":0,"toolCalls":4,"toolFailures":0,"dispatches":0,"dispatchFailures":0,"repeatDispatches":0,"writeAgentCalls":0,"builtinAgentDispatches":0,"readOnlyAgentWriteCalls":0,"mainPowershellCalls":0,"agents":[]}
+  ],
+  "skipped": []
+}

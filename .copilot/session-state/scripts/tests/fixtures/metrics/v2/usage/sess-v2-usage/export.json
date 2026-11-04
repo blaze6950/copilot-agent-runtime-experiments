@@ -1,0 +1,85 @@
+{
+  "sessionId": "sess-v2-usage",
+  "sessionStart": "2026-06-01T12:00:00Z",
+  "sessionEnd": "2026-06-01T12:10:00Z",
+  "durationMs": 600000,
+  "shutdownType": "normal",
+  "segmentCount": 1,
+  "cwd": "C:\\synthetic\\project-v2",
+  "copilotVersion": "1.0.3-test",
+  "totalPremiumRequests": 3,
+  "totalApiDurationMs": 230000,
+  "errorCount": 0,
+  "errors": [],
+  "eventTypeCounts": { "user.message": 1, "tool": 4 },
+  "modelChanges": [],
+  "compactionEvents": [],
+  "segments": [],
+  "modelMetrics": {
+    "claude-opus-5.5": { "requests": 3, "cost": 3, "costUsd": 0.3, "inputTokens": 30000, "outputTokens": 1500, "cacheReadTokens": 24000, "cacheWriteTokens": 3000, "reasoningTokens": 0 },
+    "claude-haiku-5.5": { "requests": 2, "cost": 0, "costUsd": 0.01, "inputTokens": 2000, "outputTokens": 100, "cacheReadTokens": 0, "cacheWriteTokens": 0, "reasoningTokens": 0 }
+  },
+  "costUsd": 0.36,
+  "compactionCostUsd": 0.05,
+  "sourceEventCount": 5,
+  "requests": [
+    { "timestamp": "2026-06-01T12:01:00.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 10000, "outputTokens": 500, "cacheReadTokens": 8000, "cacheWriteTokens": 1000, "durationMs": 100000, "totalNanoAiu": 15000000000, "kind": "user" },
+    { "timestamp": "2026-06-01T12:02:20.000Z", "agentId": "agent-guid-1", "model": "claude-haiku-5.5", "inputTokens": 1000, "outputTokens": 50, "cacheReadTokens": 0, "cacheWriteTokens": 0, "durationMs": 20000, "totalNanoAiu": 500000000, "kind": null },
+    { "timestamp": "2026-06-01T12:02:50.000Z", "agentId": "agent-guid-1", "model": "claude-haiku-5.5", "inputTokens": 1000, "outputTokens": 50, "cacheReadTokens": 0, "cacheWriteTokens": 0, "durationMs": 10000, "totalNanoAiu": 500000000, "kind": null },
+    { "timestamp": "2026-06-01T12:05:00.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 10000, "outputTokens": 500, "cacheReadTokens": 8000, "cacheWriteTokens": 1000, "durationMs": 50000, "totalNanoAiu": 10000000000, "kind": "user" },
+    { "timestamp": "2026-06-01T12:06:00.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 10000, "outputTokens": 500, "cacheReadTokens": 8000, "cacheWriteTokens": 1000, "durationMs": 50000, "totalNanoAiu": 5000000000, "kind": "user" }
+  ],
+  "hookWindows": [
+    { "hookInvocationId": "h4", "agentId": null, "startTs": "2026-06-01T12:01:10.000Z", "endTs": "2026-06-01T12:01:10.040Z", "durationMs": 40 },
+    { "hookInvocationId": "h1", "agentId": null, "startTs": "2026-06-01T12:01:11.000Z", "endTs": "2026-06-01T12:01:11.010Z", "durationMs": 10 },
+    { "hookInvocationId": "h10", "agentId": "agent-guid-1", "startTs": "2026-06-01T12:02:30.000Z", "endTs": "2026-06-01T12:02:30.100Z", "durationMs": 100 },
+    { "hookInvocationId": "h7", "agentId": null, "startTs": "2026-06-01T12:03:10.000Z", "endTs": "2026-06-01T12:03:10.070Z", "durationMs": 70 },
+    { "hookInvocationId": "h2", "agentId": null, "startTs": "2026-06-01T12:03:11.000Z", "endTs": "2026-06-01T12:03:11.020Z", "durationMs": 20 },
+    { "hookInvocationId": "h9", "agentId": "agent-guid-1", "startTs": "2026-06-01T12:02:31.000Z", "endTs": "2026-06-01T12:02:31.090Z", "durationMs": 90 },
+    { "hookInvocationId": "h5", "agentId": null, "startTs": "2026-06-01T12:04:10.000Z", "endTs": "2026-06-01T12:04:10.050Z", "durationMs": 50 },
+    { "hookInvocationId": "h3", "agentId": null, "startTs": "2026-06-01T12:04:11.000Z", "endTs": "2026-06-01T12:04:11.030Z", "durationMs": 30 },
+    { "hookInvocationId": "h8", "agentId": null, "startTs": "2026-06-01T12:05:10.000Z", "endTs": "2026-06-01T12:05:10.080Z", "durationMs": 80 },
+    { "hookInvocationId": "h6", "agentId": null, "startTs": "2026-06-01T12:05:11.000Z", "endTs": "2026-06-01T12:05:11.060Z", "durationMs": 60 }
+  ],
+  "toolStats": [
+    { "name": "powershell", "calls": 1, "successes": 1, "avgDurationMs": 30000.0, "minDurationMs": 30000.0, "maxDurationMs": 30000.0 },
+    { "name": "view", "calls": 3, "successes": 3, "avgDurationMs": 11666.0, "minDurationMs": 15000.0, "maxDurationMs": 20000.0 }
+  ],
+  "subagentDispatches": [
+    {
+      "label": "sub-explorer-code #1",
+      "agentName": "sub-explorer-code",
+      "callId": "toolu_x1",
+      "status": "completed",
+      "model": "claude-haiku-5.5",
+      "startTs": "2026-06-01T12:02:00.000Z",
+      "endTs": "2026-06-01T12:03:00.000Z",
+      "durationMs": 60000.0,
+      "toolCallCount": 2,
+      "totalTokens": 2100,
+      "tools": [ { "name": "view", "count": 2 } ]
+    }
+  ],
+  "timeline": {
+    "lanes": [
+      {
+        "laneId": "orchestrator",
+        "label": "ORCHESTRATOR",
+        "events": [
+          { "ts": "2026-06-01T12:00:00.000Z", "deltaMs": 0.0, "displayType": "session.start", "annotation": "synthetic" },
+          { "ts": "2026-06-01T12:00:30.000Z", "deltaMs": 30000.0, "displayType": "user.message", "contentSnippet": "synthetic user turn" },
+          { "ts": "2026-06-01T12:01:30.000Z", "deltaMs": 60000.0, "displayType": "tool", "toolName": "powershell", "toolSuccess": true, "durationMs": 30000.0, "merged": true },
+          { "ts": "2026-06-01T12:04:00.000Z", "deltaMs": 150000.0, "displayType": "tool", "toolName": "view", "toolSuccess": true, "durationMs": 20000.0, "merged": true }
+        ]
+      },
+      {
+        "laneId": "toolu_x1",
+        "label": "SUB-EXPLORER-CODE #1",
+        "events": [
+          { "ts": "2026-06-01T12:02:10.000Z", "deltaMs": 0.0, "displayType": "tool", "toolName": "view", "toolSuccess": true, "durationMs": 15000.0, "merged": true },
+          { "ts": "2026-06-01T12:02:40.000Z", "deltaMs": 30000.0, "displayType": "tool", "toolName": "view", "toolSuccess": true, "durationMs": 20000.0, "merged": true }
+        ]
+      }
+    ]
+  }
+}

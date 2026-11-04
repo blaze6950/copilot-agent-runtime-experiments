@@ -3,6 +3,7 @@
 #r "nuget: Spectre.Console, 0.49.1"
 #load "./lib/events-core.csx"
 #load "./lib/events-annotations.csx"
+#load "./lib/usage-records.csx"
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -31,7 +32,9 @@ using Spectre.Console;
 //   E  Graph Statistics
 //   H  Tool Usage Statistics
 //   J  Error / Warning Report
-//   K  Token / Cost Table       (aggregated across all session segments)
+//   K  Token / Cost Table       (requests, tokens and cost from the per-request session.usage_record events
+//                                plus compaction cost; never from summed session.shutdown modelMetrics, which
+//                                are cumulative. Sessions without usage records fall back to the shutdown sums.)
 //   I  Subagent Dispatches  (only with --dispatches flag)
 //   F  Timeline             (only with --timeline flag)
 //      Per-segment detail   (only with --segments flag, shown inside Section K)
@@ -110,13 +113,30 @@ foreach (var kv in typeCounts.OrderByDescending(x => x.Value))
 var depth       = new Dictionary<string, int>(StringComparer.Ordinal);
 var subtreeSize = new Dictionary<string, int>(StringComparer.Ordinal);
 
-void ComputeDepths(string id, int d)
+// Iterative post-order traversal — recursion overflows the stack on deep event graphs.
+void ComputeDepths(string rootId, int rootDepth)
 {
-    depth[id] = d;
-    int sz = 1;
-    if (childIndex.TryGetValue(id, out var ch))
-        foreach (var c in ch) { ComputeDepths(c, d + 1); sz += subtreeSize.GetValueOrDefault(c, 0); }
-    subtreeSize[id] = sz;
+    var stack = new Stack<ValueTuple<string, int, bool>>();
+    stack.Push(new ValueTuple<string, int, bool>(rootId, rootDepth, false));
+    while (stack.Count > 0)
+    {
+        var fr = stack.Pop();
+        var id = fr.Item1;
+        var d  = fr.Item2;
+        if (fr.Item3)
+        {
+            int sz = 1;
+            if (childIndex.TryGetValue(id, out var kids))
+                foreach (var c in kids) sz += subtreeSize.GetValueOrDefault(c, 0);
+            subtreeSize[id] = sz;
+            continue;
+        }
+        if (depth.ContainsKey(id)) continue;
+        depth[id] = d;
+        stack.Push(new ValueTuple<string, int, bool>(id, d, true));
+        if (childIndex.TryGetValue(id, out var ch))
+            foreach (var c in ch) stack.Push(new ValueTuple<string, int, bool>(c, d + 1, false));
+    }
 }
 
 foreach (var r in roots) ComputeDepths(r, 0);
@@ -410,14 +430,15 @@ if (offsetsByType.TryGetValue("session.resume", out List<long>? resumeOffsets) &
 }
 
 // Helper: render a model-metrics table for a given set of model entries.
-void RenderModelMetricsTable(IReadOnlyDictionary<string, (long reqs, double cost, long inTok, long outTok, long cacheRd, long cacheWr, long reason)> metrics)
+// costIsUsd: the cost column holds USD (from usage records) instead of the shutdown premium-request units.
+void RenderModelMetricsTable(IReadOnlyDictionary<string, (long reqs, double cost, long inTok, long outTok, long cacheRd, long cacheWr, long reason)> metrics, bool costIsUsd = false)
 {
     Console.WriteLine();
     var t = new Table()
         .NoBorder()
         .AddColumn(new TableColumn("[bold white]Model[/]").NoWrap())
         .AddColumn(new TableColumn("[bold white]Reqs[/]").RightAligned().NoWrap())
-        .AddColumn(new TableColumn("[bold white]Cost[/]").RightAligned().NoWrap())
+        .AddColumn(new TableColumn(costIsUsd ? "[bold white]Cost USD[/]" : "[bold white]Premium units[/]").RightAligned().NoWrap())
         .AddColumn(new TableColumn("[bold white]Input[/]").RightAligned().Width(10).NoWrap())
         .AddColumn(new TableColumn("[bold white]Output[/]").RightAligned().Width(8).NoWrap())
         .AddColumn(new TableColumn("[bold white]CacheRd[/]").RightAligned().Width(10).NoWrap())
@@ -428,7 +449,9 @@ void RenderModelMetricsTable(IReadOnlyDictionary<string, (long reqs, double cost
     foreach (var kv in metrics)
     {
         var (reqs, cost, inTok, outTok, cacheRd, cacheWr, reason) = kv.Value;
-        var costMarkup = cost > 0 ? $"[yellow1]{cost}[/]" : $"[grey]{cost}[/]";
+        var costMarkup = costIsUsd
+            ? (cost > 0 ? $"[yellow1]${cost:F2}[/]" : $"[grey]${cost:F2}[/]")
+            : (cost > 0 ? $"[yellow1]{cost}[/]" : $"[grey]{cost}[/]");
         t.AddRow(
             $"[white]{Markup.Escape(kv.Key)}[/]",
             $"[aqua]{reqs}[/]",
@@ -496,9 +519,30 @@ void AccumulateMetrics(
     }
 }
 
+// Per-request usage records: the source of requests, tokens and cost (shutdown modelMetrics are cumulative).
+var usageRequests = LoadUsageRequests();
+var usageByModel  = AggregateUsageByModel(usageRequests);
+
+// Helper: the Section K totals from the usage records plus compaction cost.
+void RenderUsageRecordTotals()
+{
+    long requestsNanoAiu   = usageRequests.Sum(r => r.TotalNanoAiu);
+    long compactionNanoAiu = SumCompactionNanoAiu();
+    AnsiConsole.MarkupLine($"  [grey](from {usageRequests.Count} per-request session.usage_record events; session.shutdown modelMetrics are cumulative and are not summed)[/]");
+    var metrics = new Dictionary<string, (long reqs, double cost, long inTok, long outTok, long cacheRd, long cacheWr, long reason)>(StringComparer.Ordinal);
+    foreach (var (model, totals) in usageByModel)
+        metrics[model] = (totals.Requests, UsdOfNanoAiu(totals.TotalNanoAiu), totals.InputTokens, totals.OutputTokens,
+            totals.CacheReadTokens, totals.CacheWriteTokens, totals.ReasoningTokens);
+    RenderModelMetricsTable(metrics, costIsUsd: true);
+    AnsiConsole.MarkupLine($"  [silver]Total cost           :[/] [yellow1]${UsdOfNanoAiu(requestsNanoAiu + compactionNanoAiu):F2}[/] [grey](requests ${UsdOfNanoAiu(requestsNanoAiu):F2} + compaction ${UsdOfNanoAiu(compactionNanoAiu):F2})[/]");
+}
+
 if (shutdownEv == null)
 {
-    AnsiConsole.MarkupLine("  [yellow1]WARNING:[/] No session.shutdown event found — session may be ongoing or truncated.");
+    if (usageRequests.Count > 0)
+        RenderUsageRecordTotals();
+    else
+        AnsiConsole.MarkupLine("  [yellow1]WARNING:[/] No session.shutdown event found — session may be ongoing or truncated.");
 }
 else
 {
@@ -522,8 +566,14 @@ else
     }
 
     // ── Aggregated scalars across all segments ────────────────────────────────
-    long aggApiDuration = allShutdownEvs.Sum(e => e["data"]?["totalApiDurationMs"]?.GetValue<long?>()  ?? 0);
-    int  aggPremiumReqs = allShutdownEvs.Sum(e => e["data"]?["totalPremiumRequests"]?.GetValue<int?>() ?? 0);
+    // Aggregated scalars: from the usage records when the CLI wrote them (shutdown counters are cumulative and are
+    // not summed); otherwise the per-segment shutdown values (older CLI).
+    long aggApiDuration = usageRequests.Count > 0
+        ? usageRequests.Sum(r => r.DurationMs)
+        : allShutdownEvs.Sum(e => e["data"]?["totalApiDurationMs"]?.GetValue<long?>()  ?? 0);
+    double aggPremiumReqs = usageRequests.Count > 0
+        ? usageRequests.Sum(r => r.PremiumRequestCost)
+        : allShutdownEvs.Sum(e => e["data"]?["totalPremiumRequests"]?.GetValue<double?>() ?? 0);
 
     int segmentCount = allShutdownEvs.Count;
     if (segmentCount > 1)
@@ -563,6 +613,19 @@ else
         AnsiConsole.MarkupLine($"  [silver]Current tokens       :[/] [aqua]{Markup.Escape(curTok)}[/]  [grey](system=[/][silver]{Markup.Escape(sysTok ?? "?")}[/][grey]  conversation=[/][silver]{Markup.Escape(convTok ?? "?")}[/][grey]  toolDefs=[/][silver]{Markup.Escape(toolDefTok ?? "?")}[/][grey])[/]");
 
     // ── Build aggregated model metrics ────────────────────────────────────────
+    // With usage records the totals come from them (shutdown metrics are cumulative, never summed);
+    // the per-segment shutdown tables are cumulative too, so --segments adds nothing there.
+    if (usageRequests.Count > 0)
+    {
+        if (showSegments && segmentCount > 1)
+            AnsiConsole.MarkupLine("  [grey]--segments: the per-segment shutdown tables are cumulative on this CLI version and are not shown; see export.json requests[] for per-request data[/]");
+        RenderUsageRecordTotals();
+    }
+    else
+    {
+    // Legacy path (older CLI versions without usage records, per-segment shutdown counters); body kept at its
+    // original indentation to keep the diff small.
+    AnsiConsole.MarkupLine("  [silver]Total cost           :[/] [grey]n/a (no session.usage_record events; the table shows premium units)[/]");
     var aggMetrics = new Dictionary<string, (long reqs, double cost, long inTok, long outTok, long cacheRd, long cacheWr, long reason)>(StringComparer.Ordinal);
     foreach (var ev in allShutdownEvs)
         AccumulateMetrics(aggMetrics, MetricsFromShutdown(ev));
@@ -629,6 +692,7 @@ else
         }
 
         RenderModelMetricsTable(aggMetrics);
+    }
     }
 }
 

@@ -1,0 +1,5 @@
+{"type":"session.start","id":"e01","timestamp":"2026-10-04T10:00:00.000Z","parentId":null,"data":{"sessionId":"fx-legacy","copilotVersion":"1.0.51","context":{"cwd":"C:\\synthetic\\fx"}}}
+{"type":"user.message","id":"e02","timestamp":"2026-10-04T10:00:01.000Z","parentId":"e01","data":{"content":"hello"}}
+{"type":"session.shutdown","id":"e03","timestamp":"2026-10-04T10:05:00.000Z","parentId":"e02","data":{"shutdownType":"routine","totalPremiumRequests":2,"totalApiDurationMs":2000,"modelMetrics":{"claude-opus-5.5":{"requests":{"count":2,"cost":2},"usage":{"inputTokens":400,"outputTokens":40,"cacheReadTokens":0,"cacheWriteTokens":0,"reasoningTokens":0}}}}}
+{"type":"session.resume","id":"e04","timestamp":"2026-10-04T10:10:00.000Z","parentId":"e03","data":{}}
+{"type":"session.shutdown","id":"e05","timestamp":"2026-10-04T10:15:00.000Z","parentId":"e04","data":{"shutdownType":"routine","totalPremiumRequests":1,"totalApiDurationMs":1000,"modelMetrics":{"claude-opus-5.5":{"requests":{"count":1,"cost":1},"usage":{"inputTokens":100,"outputTokens":10,"cacheReadTokens":0,"cacheWriteTokens":0,"reasoningTokens":0}}}}}

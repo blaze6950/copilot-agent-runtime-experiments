@@ -1,0 +1,97 @@
+{
+  "sessionId": "sess-c-powershell",
+  "sessionStart": "2026-05-03T14:00:00Z",
+  "sessionEnd": "2026-05-03T16:00:00Z",
+  "durationMs": 7200000,
+  "shutdownType": "normal",
+  "segmentCount": 2,
+  "cwd": "C:\\synthetic\\project-c",
+  "copilotVersion": "1.0.2-test",
+  "totalPremiumRequests": 4,
+  "totalApiDurationMs": 2000,
+  "errorCount": 2,
+  "errors": [
+    { "ts": "2026-05-03T14:31:00Z", "type": "tool.execution_complete", "scope": "orchestrator", "detail": "synthetic error one" },
+    { "ts": "2026-05-03T15:31:00Z", "type": "tool.execution_complete", "scope": "orchestrator", "detail": "synthetic error two" }
+  ],
+  "eventTypeCounts": { "user.message": 3, "tool": 8 },
+  "modelChanges": [],
+  "compactionEvents": [
+    { "ts": "2026-05-03T15:30:00Z", "tokensBefore": 90000, "tokensAfter": 30000 }
+  ],
+  "segments": [
+    {
+      "index": 1,
+      "resumeTs": "2026-05-03T14:00:00Z",
+      "shutdownTs": "2026-05-03T15:00:00Z",
+      "durationMs": 3600000,
+      "totalPremiumRequests": 2,
+      "totalApiDurationMs": 1000,
+      "codeChanges": { "linesAdded": 1, "linesRemoved": 0, "filesModified": [] },
+      "modelMetrics": {
+        "claude-sonnet-4.6": { "requests": 2, "cost": 0.5, "inputTokens": 2000, "outputTokens": 500, "cacheReadTokens": 3000, "cacheWriteTokens": 0, "reasoningTokens": null }
+      }
+    },
+    {
+      "index": 2,
+      "resumeTs": "2026-05-03T15:00:00Z",
+      "shutdownTs": "2026-05-03T16:00:00Z",
+      "durationMs": 3600000,
+      "totalPremiumRequests": 2,
+      "totalApiDurationMs": 1000,
+      "codeChanges": { "linesAdded": 0, "linesRemoved": 0, "filesModified": [] },
+      "modelMetrics": {
+        "claude-sonnet-4.6": { "requests": 2, "cost": 0.5, "inputTokens": 2000, "outputTokens": 500, "cacheReadTokens": 3000, "cacheWriteTokens": 0, "reasoningTokens": null },
+        "claude-haiku-4.5": { "requests": 1, "cost": 0.0, "inputTokens": 200, "outputTokens": 10, "cacheReadTokens": null, "cacheWriteTokens": 0, "reasoningTokens": null }
+      }
+    }
+  ],
+  "modelMetrics": {
+    "claude-sonnet-4.6": { "requests": 4, "cost": 1.0, "inputTokens": 4000, "outputTokens": 1000, "cacheReadTokens": 6000, "cacheWriteTokens": 0, "reasoningTokens": null },
+    "claude-haiku-4.5": { "requests": 1, "cost": 0.0, "inputTokens": 200, "outputTokens": 10, "cacheWriteTokens": 0 }
+  },
+  "toolStats": [
+    { "name": "powershell", "calls": 3, "successes": 2, "avgDurationMs": 800.0, "minDurationMs": 100.0, "maxDurationMs": 1500.0 },
+    { "name": "view", "calls": 4, "successes": 4, "avgDurationMs": 20.0, "minDurationMs": 5.0, "maxDurationMs": 40.0 }
+  ],
+  "subagentDispatches": [
+    {
+      "label": "sub-reviewer-code #1",
+      "agentName": "sub-reviewer-code",
+      "callId": "call-c1",
+      "status": "completed",
+      "model": "claude-haiku-4.5",
+      "startTs": "2026-05-03T15:10:30.000Z",
+      "endTs": "2026-05-03T15:10:31.000Z",
+      "durationMs": 800.0,
+      "toolCallCount": 2,
+      "tools": [ { "name": "read", "count": 2 } ],
+      "prompt": "synthetic prompt c1",
+      "answer": "synthetic answer c1"
+    }
+  ],
+  "timeline": {
+    "lanes": [
+      {
+        "laneId": "orchestrator",
+        "label": "ORCHESTRATOR",
+        "events": [
+          { "ts": "2026-05-03T14:00:00.000Z", "deltaMs": 0.0, "displayType": "session.start", "annotation": "synthetic" },
+          { "ts": "2026-05-03T14:00:01.000Z", "deltaMs": 1000.0, "displayType": "user.message", "contentSnippet": "synthetic user turn 1" },
+          { "ts": "2026-05-03T14:01:00.000Z", "deltaMs": 59000.0, "displayType": "tool", "toolName": "powershell", "toolSuccess": true, "durationMs": 100.0, "merged": true },
+          { "ts": "2026-05-03T14:02:00.000Z", "deltaMs": 60000.0, "displayType": "tool", "toolName": "view", "toolSuccess": true, "durationMs": 20.0, "merged": true },
+          { "ts": "2026-05-03T14:20:00.000Z", "deltaMs": 1080000.0, "displayType": "user.message", "contentSnippet": "synthetic user turn 2" },
+          { "ts": "2026-05-03T14:30:00.000Z", "deltaMs": 600000.0, "displayType": "tool", "toolName": "powershell", "toolSuccess": false, "durationMs": 1500.0, "merged": true },
+          { "ts": "2026-05-03T15:10:00.000Z", "deltaMs": 2400000.0, "displayType": "user.message", "contentSnippet": "synthetic user turn 3" }
+        ]
+      },
+      {
+        "laneId": "toolu_synthetic_c1",
+        "label": "SUB-REVIEWER-CODE",
+        "events": [
+          { "ts": "2026-05-03T14:40:00.000Z", "deltaMs": 0.0, "displayType": "tool", "toolName": "powershell", "toolSuccess": true, "durationMs": 300.0, "merged": true }
+        ]
+      }
+    ]
+  }
+}

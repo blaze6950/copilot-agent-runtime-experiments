@@ -3,6 +3,7 @@
 #pragma warning disable CS8601  // TryGetValue out vars in nullable context — false positives in scripts
 #load "./lib/events-core.csx"
 #load "./lib/events-annotations.csx"
+#load "./lib/usage-records.csx"
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -23,25 +24,44 @@ using System.Text.Json.Serialization;
 //
 // SCHEMA (top-level keys):
 //   sessionId, sessionStart, sessionEnd, durationMs, shutdownType, segmentCount, cwd, copilotVersion
-//   totalPremiumRequests, totalApiDurationMs  — aggregated across all session segments
+//   totalPremiumRequests, totalApiDurationMs  — with usage records: sum of the per-request records (premium units from user-initiated records only, see lib/usage-records.csx;
+//                           request durations). Without them (older CLI): sum of the per-segment shutdown values.
+//                           Shutdown counters are cumulative on current CLI versions, so they are not summed then.
 //   eventTypeCounts       — { type: count }
 //   graphStats            — { total, totalEdges, roots, orphans, maxDepth, avgBranching,
 //                             internalNodes, leafNodes, maxToolChainLen, hookPairs,
 //                             unmatchedHookEnds }
 //   hookPairs             — [ { hookType, durationMs, success } ]
 //   modelChanges          — [ { ts, previousModel, newModel } ]
-//   compactionEvents      — [ { ts, tokensBefore, tokensAfter } ]
+//   compactionEvents      — [ { ts, tokensBefore, tokensAfter, costUsd } ]
 //   segments              — [ { index, resumeTs, shutdownTs, durationMs, totalPremiumRequests,
-//                               totalApiDurationMs, codeChanges, modelMetrics } ]  (one per segment)
+//                               totalApiDurationMs, codeChanges, modelMetrics } ]  (one per segment;
+//                               modelMetrics are the shutdown counters as the CLI wrote them — CUMULATIVE
+//                               on current CLI versions, so never add them up across segments)
 //   modelMetrics          — { modelName: { requests, cost, inputTokens, outputTokens,
-//                                          cacheReadTokens, cacheWriteTokens, reasoningTokens } }
-//                           aggregated across all session segments
+//                                          cacheReadTokens, cacheWriteTokens, reasoningTokens, costUsd } }
+//                           computed from the per-request records (requests); `cost` = sum of the user-initiated records'
+//                           premium-request units, `costUsd` = sum of totalNanoAiu / 1e11.
+//                           Sessions without session.usage_record events (older CLI versions) fall back to the
+//                           sum of the per-segment shutdown metrics, without costUsd.
+//   requests              — [ { timestamp, agentId (null = root), model, inputTokens, outputTokens,
+//                               cacheReadTokens, cacheWriteTokens, durationMs, totalNanoAiu,
+//                               kind (root only: user | keepalive | notice) } ]  one per session.usage_record.
+//                           inputTokens already includes the cache tokens.
+//   hookWindows           — [ { hookInvocationId, agentId (null = root), startTs, endTs, durationMs } ]
+//                           preToolUse hook.start -> hook.end pairs
+//   costUsd               — total cost: sum of request totalNanoAiu + compaction cost, / 1e11; null when the session
+//                           has no session.usage_record events (older CLI): the cost is unknown, not 0
+//   compactionCostUsd     — compaction part of costUsd (session.compaction_complete copilotUsage)
+//   sourceEventCount      — number of non-blank events.jsonl lines read; compare with the file to detect a stale export
 //   toolStats             — [ { name, calls, successes, avgDurationMs, minDurationMs, maxDurationMs } ]
 //   errors                — [ { ts, type, scope, detail } ]
 //   errorCount            — int
-//   subagentDispatches    — [ { label, agentName, callId, status, model, startTs, endTs,
+//   subagentDispatches    — [ { label, agentName, callId, agentId, status, model, startTs, endTs,
 //                               durationMs, inputTokens, outputTokens, totalTokens,
 //                               toolCallCount, tools[], prompt, answer } ]
+//                           agentId = envelope agentId of the subagent.started event (the same id the sub-agent's
+//                           requests[] and hookWindows[] carry); omitted when the event has none.
 //   timeline              — { lanes: [ { laneId, label, events: [ EventAnnotation + ts/deltaMs/merged ] } ] }
 //
 // NOTE: contentSnippet in timeline events is truncated to 120 chars.
@@ -116,7 +136,7 @@ double? sessionDuration = null;
 string? shutdownType    = null;
 string? cwd             = null;
 string? copilotVersion  = null;
-int?    totalPremiumRequests   = null;
+double? totalPremiumRequests   = null;
 long?   totalApiDurationMs     = null;
 long?   sessionStartTime       = null;
 int?    codeChangesLinesAdded  = null;
@@ -136,6 +156,15 @@ if (offsetsByType.TryGetValue("session.start", out List<long> startOffsets) && s
     sessionStart   = SafeStr(ev, "timestamp");
     copilotVersion = SafeStr(d, "copilotVersion");
     cwd            = SafeStr(d?["context"], "cwd");
+}
+
+// Per-request usage records (current CLI). Loaded once; the totals below and the model metrics use them.
+var usageRequests = LoadUsageRequests();
+if (usageRequests.Count > 0)
+{
+    // Cumulative shutdown counters are not summed: the records give each request once.
+    totalPremiumRequests = usageRequests.Sum(r => r.PremiumRequestCost);
+    totalApiDurationMs   = usageRequests.Sum(r => r.DurationMs);
 }
 
 // Populated in the shutdown block below; used by both model-metrics and segments sections.
@@ -163,9 +192,13 @@ if (offsetsByType.TryGetValue("session.shutdown", out List<long> shutOffsets) &&
     try { conversationTokens    = d?["conversationTokens"]?.GetValue<int?>();   }  catch { }
     try { toolDefinitionsTokens = d?["toolDefinitionsTokens"]?.GetValue<int?>(); } catch { }
 
-    // Aggregated fields: sum across all shutdown segments
-    try { totalPremiumRequests = allShutEvs.Sum(ev => ev["data"]?["totalPremiumRequests"]?.GetValue<int?>()  ?? 0); } catch { }
-    try { totalApiDurationMs   = allShutEvs.Sum(ev => ev["data"]?["totalApiDurationMs"]?.GetValue<long?>()   ?? 0); } catch { }
+    // Legacy aggregate (no usage records, older CLI, per-segment shutdown counters): sum across all shutdown segments.
+    // With usage records the totals come from the records above.
+    if (usageRequests.Count == 0)
+    {
+        try { totalPremiumRequests = allShutEvs.Sum(ev => ev["data"]?["totalPremiumRequests"]?.GetValue<double?>()  ?? 0); } catch { }
+        try { totalApiDurationMs   = allShutEvs.Sum(ev => ev["data"]?["totalApiDurationMs"]?.GetValue<long?>()   ?? 0); } catch { }
+    }
 
     // codeChanges: sum lines, union files (insertion-order dedup)
     int totalAdded = 0, totalRemoved = 0;
@@ -204,13 +237,30 @@ if (offsetsByType.TryGetValue("session.shutdown", out List<long> shutOffsets) &&
 var depth       = new Dictionary<string, int>(StringComparer.Ordinal);
 var subtreeSize = new Dictionary<string, int>(StringComparer.Ordinal);
 
-void ComputeDepths(string id, int d)
+// Iterative post-order traversal — recursion overflows the stack on deep event graphs.
+void ComputeDepths(string rootId, int rootDepth)
 {
-    depth[id] = d;
-    int sz = 1;
-    if (childIndex.TryGetValue(id, out var ch))
-        foreach (var c in ch) { ComputeDepths(c, d + 1); sz += subtreeSize.GetValueOrDefault(c, 0); }
-    subtreeSize[id] = sz;
+    var stack = new Stack<ValueTuple<string, int, bool>>();
+    stack.Push(new ValueTuple<string, int, bool>(rootId, rootDepth, false));
+    while (stack.Count > 0)
+    {
+        var fr = stack.Pop();
+        var id = fr.Item1;
+        var d  = fr.Item2;
+        if (fr.Item3)
+        {
+            int sz = 1;
+            if (childIndex.TryGetValue(id, out var kids))
+                foreach (var c in kids) sz += subtreeSize.GetValueOrDefault(c, 0);
+            subtreeSize[id] = sz;
+            continue;
+        }
+        if (depth.ContainsKey(id)) continue;
+        depth[id] = d;
+        stack.Push(new ValueTuple<string, int, bool>(id, d, true));
+        if (childIndex.TryGetValue(id, out var ch))
+            foreach (var c in ch) stack.Push(new ValueTuple<string, int, bool>(c, d + 1, false));
+    }
 }
 foreach (var r in roots) ComputeDepths(r, 0);
 foreach (var id in orphans) if (!depth.ContainsKey(id)) ComputeDepths(id, 0);
@@ -296,7 +346,8 @@ if (offsetsByType.TryGetValue("session.compaction_complete", out List<long> comp
         {
             ts           = SafeStr(endEv, "timestamp"),
             tokensBefore = TryGetLong(d, "preCompactionTokens"),
-            tokensAfter  = (long?)null   // post-compaction tokens not in this event
+            tokensAfter  = (long?)null,   // post-compaction tokens not in this event
+            costUsd      = CompactionNanoAiuOf(endEv) > 0 ? (double?)UsdOfNanoAiu(CompactionNanoAiuOf(endEv)) : null
         });
     }
 }
@@ -385,7 +436,7 @@ for (int si = 0; si < allShutEvs.Count; si++)
         resumeTs             = segResumeTs,
         shutdownTs           = segShutdownTs,
         durationMs           = segDurationMs,
-        totalPremiumRequests = segD?["totalPremiumRequests"]?.GetValue<int?>(),
+        totalPremiumRequests = segD?["totalPremiumRequests"]?.GetValue<double?>(),
         totalApiDurationMs   = segD?["totalApiDurationMs"]?.GetValue<long?>(),
         codeChanges          = segCodeChanges,
         modelMetrics         = segMetrics.Count > 0 ? segMetrics : null
@@ -393,57 +444,84 @@ for (int si = 0; si < allShutEvs.Count; si++)
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// MODEL METRICS  (aggregated across all session.shutdown events)
+// MODEL METRICS  (from the per-request session.usage_record events)
+//
+// session.shutdown modelMetrics are cumulative counters on current CLI versions, and requests after the last
+// shutdown are in none of them, so they are NOT summed here. Only a session without any usage record (older
+// CLI versions, whose shutdown counters are per segment) falls back to the per-segment shutdown sums.
 // ═════════════════════════════════════════════════════════════════════════════
 
 var modelMetricsDict = new Dictionary<string, object>(StringComparer.Ordinal);
-// Insertion-order: first model encountered across segments defines key order.
-var modelKeySeen = new HashSet<string>(StringComparer.Ordinal);
-var modelAgg = new Dictionary<string, (long reqs, double cost, long inTok, long outTok, long cacheRd, long cacheWr, long reason)>(StringComparer.Ordinal);
+var requestsJson = usageRequests.Select(UsageRequestToJson).ToList();
+var hookWindowsJson = BuildPreToolUseHookWindows();
+long requestsNanoAiu = usageRequests.Sum(r => r.TotalNanoAiu);
+long compactionNanoAiu = SumCompactionNanoAiu();
 
-foreach (var shutEv in allShutEvs)
+if (usageRequests.Count > 0)
 {
-    var mm = shutEv["data"]?["modelMetrics"];
-    if (mm is not JsonObject mmObj) { continue; }
-    foreach (var kv in mmObj)
+    foreach (var (model, totals) in AggregateUsageByModel(usageRequests))
     {
-        var mv = kv.Value;
-        var r = (
-            reqs:    mv?["requests"]?["count"]?.GetValue<long?>()        ?? 0,
-            cost:    mv?["requests"]?["cost"]?.GetValue<double?>()       ?? 0,
-            inTok:   mv?["usage"]?["inputTokens"]?.GetValue<long?>()     ?? 0,
-            outTok:  mv?["usage"]?["outputTokens"]?.GetValue<long?>()    ?? 0,
-            cacheRd: mv?["usage"]?["cacheReadTokens"]?.GetValue<long?>() ?? 0,
-            cacheWr: mv?["usage"]?["cacheWriteTokens"]?.GetValue<long?>() ?? 0,
-            reason:  mv?["usage"]?["reasoningTokens"]?.GetValue<long?>() ?? 0
-        );
-        modelKeySeen.Add(kv.Key);
-        if (modelAgg.TryGetValue(kv.Key, out var ex))
+        modelMetricsDict[model] = new
         {
-            modelAgg[kv.Key] = (ex.reqs + r.reqs, ex.cost + r.cost,
-                ex.inTok + r.inTok, ex.outTok + r.outTok,
-                ex.cacheRd + r.cacheRd, ex.cacheWr + r.cacheWr, ex.reason + r.reason);
-        }
-        else
-        {
-            modelAgg[kv.Key] = r;
-        }
+            requests         = (int)totals.Requests,
+            cost             = totals.PremiumRequestCost,
+            inputTokens      = totals.InputTokens,
+            outputTokens     = totals.OutputTokens,
+            cacheReadTokens  = totals.CacheReadTokens,
+            cacheWriteTokens = totals.CacheWriteTokens,
+            reasoningTokens  = totals.ReasoningTokens > 0 ? (long?)totals.ReasoningTokens : null,
+            costUsd          = UsdOfNanoAiu(totals.TotalNanoAiu)
+        };
     }
 }
-
-foreach (var key in modelAgg.Keys)
+else
 {
-    var (reqs, cost, inTok, outTok, cacheRd, cacheWr, reason) = modelAgg[key];
-    modelMetricsDict[key] = new
+    // Legacy fallback: per-segment shutdown counters (older CLI versions), summed.
+    var modelAgg = new Dictionary<string, (long reqs, double cost, long inTok, long outTok, long cacheRd, long cacheWr, long reason)>(StringComparer.Ordinal);
+
+    foreach (var shutEv in allShutEvs)
     {
-        requests         = (int)reqs,
-        cost,
-        inputTokens      = inTok,
-        outputTokens     = outTok,
-        cacheReadTokens  = cacheRd,
-        cacheWriteTokens = cacheWr,
-        reasoningTokens  = reason > 0 ? (long?)reason : null
-    };
+        var mm = shutEv["data"]?["modelMetrics"];
+        if (mm is not JsonObject mmObj) { continue; }
+        foreach (var kv in mmObj)
+        {
+            var mv = kv.Value;
+            var r = (
+                reqs:    mv?["requests"]?["count"]?.GetValue<long?>()        ?? 0,
+                cost:    mv?["requests"]?["cost"]?.GetValue<double?>()       ?? 0,
+                inTok:   mv?["usage"]?["inputTokens"]?.GetValue<long?>()     ?? 0,
+                outTok:  mv?["usage"]?["outputTokens"]?.GetValue<long?>()    ?? 0,
+                cacheRd: mv?["usage"]?["cacheReadTokens"]?.GetValue<long?>() ?? 0,
+                cacheWr: mv?["usage"]?["cacheWriteTokens"]?.GetValue<long?>() ?? 0,
+                reason:  mv?["usage"]?["reasoningTokens"]?.GetValue<long?>() ?? 0
+            );
+            if (modelAgg.TryGetValue(kv.Key, out var ex))
+            {
+                modelAgg[kv.Key] = (ex.reqs + r.reqs, ex.cost + r.cost,
+                    ex.inTok + r.inTok, ex.outTok + r.outTok,
+                    ex.cacheRd + r.cacheRd, ex.cacheWr + r.cacheWr, ex.reason + r.reason);
+            }
+            else
+            {
+                modelAgg[kv.Key] = r;
+            }
+        }
+    }
+
+    foreach (var key in modelAgg.Keys)
+    {
+        var (reqs, cost, inTok, outTok, cacheRd, cacheWr, reason) = modelAgg[key];
+        modelMetricsDict[key] = new
+        {
+            requests         = (int)reqs,
+            cost,
+            inputTokens      = inTok,
+            outputTokens     = outTok,
+            cacheReadTokens  = cacheRd,
+            cacheWriteTokens = cacheWr,
+            reasoningTokens  = reason > 0 ? (long?)reason : null
+        };
+    }
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -688,6 +766,7 @@ if (offsetsByType.TryGetValue("subagent.started", out List<long> subStartOffsets
             label,
             agentName,
             callId,
+            agentId      = SafeStr(startEv, "agentId"),
             status,
             model,
             startTs,
@@ -932,6 +1011,11 @@ var output = new
     compactionEvents = compactionList,
     segments         = segmentsList,
     modelMetrics     = modelMetricsDict,
+    requests         = requestsJson,
+    hookWindows      = hookWindowsJson,
+    costUsd          = usageRequests.Count > 0 ? UsdOfNanoAiu(requestsNanoAiu + compactionNanoAiu) : (double?)null,
+    compactionCostUsd = UsdOfNanoAiu(compactionNanoAiu),
+    sourceEventCount = totalLines - skippedBlanks,
     toolStats        = toolStatsList,
     errorCount       = errorsList.Count,
     errors           = errorsList,

@@ -1,0 +1,7 @@
+{
+  "sessionId": "sess-malformed",
+  "sessionStart": "2026-05-04T10:00:00Z",
+  "sessionEnd": "2026-05-04T10:10:00Z",
+  "durationMs": 600000,
+  "subagentDispatches": [
+    { "label": "explore #1", "agentName": "explore", "status": "completed"

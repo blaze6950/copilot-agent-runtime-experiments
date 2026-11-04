@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-18T09:00:00Z",
+  "source": "fixture: sessions without model data",
+  "sessions": [
+    {"sessionId":"nm01","startTime":"2026-09-07T09:00:00+02:00","endTime":"2026-09-07T09:40:00+02:00","cwd":"C:\\repos\\gamma","gitRoot":"C:\\repos\\gamma","copilotVersion":"1.0.98","durationMs":2400000,"userTurns":4,"premiumRequests":1,"models":[{"model":"model-a","requests":2,"inputTokens":1000,"outputTokens":100,"cacheReadTokens":0,"cacheWriteTokens":0}],"cacheReadRatio":0.5,"compactions":0,"peakContextTokens":20000,"errors":0,"toolCalls":10,"toolFailures":0,"dispatches":0,"dispatchFailures":0,"repeatDispatches":0,"writeAgentCalls":0,"builtinAgentDispatches":0,"readOnlyAgentWriteCalls":0,"mainPowershellCalls":1,"agents":[]},
+    {"sessionId":"nm02","startTime":"2026-09-08T10:00:00+02:00","endTime":"2026-09-08T10:30:00+02:00","cwd":"C:\\repos\\gamma","gitRoot":"C:\\repos\\gamma","copilotVersion":"1.0.98","durationMs":1800000,"userTurns":3,"premiumRequests":0,"models":[],"cacheReadRatio":null,"compactions":0,"peakContextTokens":null,"errors":0,"toolCalls":5,"toolFailures":0,"dispatches":0,"dispatchFailures":0,"repeatDispatches":0,"writeAgentCalls":0,"builtinAgentDispatches":0,"readOnlyAgentWriteCalls":0,"mainPowershellCalls":0,"agents":[]},
+    {"sessionId":"nm03","startTime":"2026-09-08T11:00:00+02:00","endTime":"2026-09-08T11:20:00+02:00","cwd":"C:\\repos\\gamma","gitRoot":"C:\\repos\\gamma","copilotVersion":"1.0.98","durationMs":1200000,"userTurns":2,"premiumRequests":0,"models":[],"cacheReadRatio":null,"compactions":0,"peakContextTokens":null,"errors":0,"toolCalls":4,"toolFailures":0,"dispatches":0,"dispatchFailures":0,"repeatDispatches":0,"writeAgentCalls":0,"builtinAgentDispatches":0,"readOnlyAgentWriteCalls":0,"mainPowershellCalls":0,"agents":[]},
+    {"sessionId":"nm04","startTime":"2026-09-07T15:00:00+02:00","endTime":"2026-09-07T15:30:00+02:00","cwd":"C:\\repos\\gamma","gitRoot":"C:\\repos\\gamma","copilotVersion":"1.0.98","durationMs":1800000,"userTurns":5,"premiumRequests":0,"models":[],"cacheReadRatio":null,"compactions":0,"peakContextTokens":null,"errors":0,"toolCalls":6,"toolFailures":0,"dispatches":0,"dispatchFailures":0,"repeatDispatches":0,"writeAgentCalls":0,"builtinAgentDispatches":0,"readOnlyAgentWriteCalls":0,"mainPowershellCalls":0,"agents":[]}
+  ],
+  "skipped": []
+}

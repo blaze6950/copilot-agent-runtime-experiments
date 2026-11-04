@@ -1,0 +1,58 @@
+{
+  "sessionId": "sess-v2-chains",
+  "sessionStart": "2026-06-02T09:00:00Z",
+  "sessionEnd": "2026-06-02T11:00:00Z",
+  "durationMs": 7200000,
+  "shutdownType": "normal",
+  "segmentCount": 1,
+  "cwd": "C:\\synthetic\\project-chains",
+  "copilotVersion": "1.0.3-test",
+  "totalPremiumRequests": 0,
+  "totalApiDurationMs": 0,
+  "errorCount": 0,
+  "errors": [],
+  "eventTypeCounts": { "user.message": 9 },
+  "modelChanges": [],
+  "compactionEvents": [],
+  "segments": [],
+  "costUsd": 1.3,
+  "compactionCostUsd": 0,
+  "sourceEventCount": 20,
+  "requests": [
+    { "timestamp": "2026-06-02T09:00:20.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 5000, "outputTokens": 100, "cacheReadTokens": 1000, "cacheWriteTokens": 4000, "durationMs": 1000, "totalNanoAiu": 20000000000, "kind": "user" },
+    { "timestamp": "2026-06-02T09:10:03.000Z", "agentId": "agent-guid-9", "model": "claude-haiku-5.5", "inputTokens": 1000, "outputTokens": 10, "cacheReadTokens": 0, "cacheWriteTokens": 0, "durationMs": 500, "totalNanoAiu": 10000000000, "kind": null },
+    { "timestamp": "2026-06-02T09:10:05.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 30000, "outputTokens": 5, "cacheReadTokens": 30000, "cacheWriteTokens": 0, "durationMs": 800, "totalNanoAiu": 1000000000, "kind": "keepalive" },
+    { "timestamp": "2026-06-02T09:10:40.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 30000, "outputTokens": 400, "cacheReadTokens": 30000, "cacheWriteTokens": 0, "durationMs": 9000, "totalNanoAiu": 50000000000, "kind": "keepalive" },
+    { "timestamp": "2026-06-02T09:11:10.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 30000, "outputTokens": 400, "cacheReadTokens": 30000, "cacheWriteTokens": 0, "durationMs": 9000, "totalNanoAiu": 50000000000, "kind": "keepalive" },
+    { "timestamp": "2026-06-02T09:20:05.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 30000, "outputTokens": 5, "cacheReadTokens": 30000, "cacheWriteTokens": 0, "durationMs": 800, "totalNanoAiu": 2000000000, "kind": "keepalive" },
+    { "timestamp": "2026-06-02T09:30:05.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 50000, "outputTokens": 300, "cacheReadTokens": 10000, "cacheWriteTokens": 40000, "durationMs": 7000, "totalNanoAiu": 30000000000, "kind": "user" },
+    { "timestamp": "2026-06-02T09:40:05.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 50000, "outputTokens": 5, "cacheReadTokens": 50000, "cacheWriteTokens": 0, "durationMs": 800, "totalNanoAiu": 3000000000, "kind": "keepalive" },
+    { "timestamp": "2026-06-02T09:50:05.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 50000, "outputTokens": 300, "cacheReadTokens": 49000, "cacheWriteTokens": 1000, "durationMs": 7000, "totalNanoAiu": 30000000000, "kind": "user" },
+    { "timestamp": "2026-06-02T10:00:05.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 50000, "outputTokens": 5, "cacheReadTokens": 50000, "cacheWriteTokens": 0, "durationMs": 800, "totalNanoAiu": 4000000000, "kind": "keepalive" },
+    { "timestamp": "2026-06-02T10:10:05.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 10000, "outputTokens": 300, "cacheReadTokens": 1000, "cacheWriteTokens": 9000, "durationMs": 3000, "totalNanoAiu": 5000000000, "kind": "user" },
+    { "timestamp": "2026-06-02T10:20:05.000Z", "agentId": null, "model": "claude-opus-5.5", "inputTokens": 10000, "outputTokens": 5, "cacheReadTokens": 10000, "cacheWriteTokens": 0, "durationMs": 800, "totalNanoAiu": 5000000000, "kind": "keepalive" }
+  ],
+  "hookWindows": [],
+  "toolStats": [],
+  "subagentDispatches": [],
+  "timeline": {
+    "lanes": [
+      {
+        "laneId": "orchestrator",
+        "label": "ORCHESTRATOR",
+        "events": [
+          { "ts": "2026-06-02T09:00:00.000Z", "deltaMs": 0.0, "displayType": "session.start", "annotation": "synthetic" },
+          { "ts": "2026-06-02T09:00:10.000Z", "deltaMs": 10000.0, "displayType": "user.message", "contentSnippet": "synthetic user turn 1" },
+          { "ts": "2026-06-02T09:10:00.000Z", "deltaMs": 590000.0, "displayType": "user.message", "contentSnippet": "[keepalive] synthetic ping 1" },
+          { "ts": "2026-06-02T09:20:00.000Z", "deltaMs": 600000.0, "displayType": "user.message", "contentSnippet": "[keepalive] synthetic ping 2" },
+          { "ts": "2026-06-02T09:30:00.000Z", "deltaMs": 600000.0, "displayType": "user.message", "contentSnippet": "synthetic user turn 2" },
+          { "ts": "2026-06-02T09:40:00.000Z", "deltaMs": 600000.0, "displayType": "user.message", "contentSnippet": "[keepalive] synthetic ping 3" },
+          { "ts": "2026-06-02T09:50:00.000Z", "deltaMs": 600000.0, "displayType": "user.message", "contentSnippet": "synthetic user turn 3" },
+          { "ts": "2026-06-02T10:00:00.000Z", "deltaMs": 600000.0, "displayType": "user.message", "contentSnippet": "[keepalive] synthetic ping 4" },
+          { "ts": "2026-06-02T10:10:00.000Z", "deltaMs": 600000.0, "displayType": "user.message", "contentSnippet": "synthetic user turn 4" },
+          { "ts": "2026-06-02T10:20:00.000Z", "deltaMs": 600000.0, "displayType": "user.message", "contentSnippet": "[keepalive] synthetic ping 5" }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "source": "fixture: synthetic prices (USD per million tokens)",
+  "retrieved": "2026-10-01",
+  "models": {
+    "model-a": { "input": 3.0, "output": 15.0, "cacheRead": 0.3, "cacheWrite": 3.75 },
+    "model-b": { "input": 0.5, "output": 2.0, "cacheRead": 0.05, "cacheWrite": 0.6 }
+  }
+}
