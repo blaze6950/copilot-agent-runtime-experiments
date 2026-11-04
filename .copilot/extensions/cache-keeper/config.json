@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "marginSec": 30,
+  "fallbackTtlSec": 300,
+  "ladder": {
+    "keepalives": 10,
+    "actions": [
+      { "id": "save", "command": "/save", "when": { "changedSinceLastRun": true, "agents": ["1main"] }, "ifRemoved": "retry" },
+      { "id": "compact", "command": "/compact", "when": { "minContextTokens": 150000 }, "ifRemoved": "skip" }
+    ]
+  },
+  "statusLine": { "countdown": false },
+  "rescue": { "enabled": true, "marginSec": 45 },
+  "wait": { "enabled": true, "maxRefreshes": 50 }
+}
