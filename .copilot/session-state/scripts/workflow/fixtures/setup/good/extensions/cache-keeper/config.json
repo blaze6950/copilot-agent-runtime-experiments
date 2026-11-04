@@ -1,0 +1,7 @@
+{
+  "ladder": {
+    "actions": [
+      { "id": "save", "command": "/save", "when": { "agents": ["util-workflow-analyst"] } }
+    ]
+  }
+}

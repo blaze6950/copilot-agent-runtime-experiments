@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "hooks": {
+    "subagentStart": [
+      { "type": "command", "command": "pwsh -NoProfile -File $HOME/.copilot/subagent-context/inject.ps1" }
+    ]
+  }
+}

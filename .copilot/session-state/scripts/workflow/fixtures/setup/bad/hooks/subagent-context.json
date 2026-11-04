@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      { "type": "command", "command": "pwsh -NoProfile -File $HOME/.copilot/cli-tools/missing-hook.ps1" }
+    ]
+  }
+}

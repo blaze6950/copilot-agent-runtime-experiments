@@ -1,0 +1,5 @@
+session-state/
+logs/
+*.log
+extensions/cache-keeper/state/
+reports/

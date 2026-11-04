@@ -1,0 +1,7 @@
+{
+  "Rules": [
+    "Shell discipline: synthetic fixture rule. Write PowerShell syntax only.",
+    "Read and search with built-in tools: `view` for files, `grep` for content, `glob` for files by name."
+  ],
+  "CliTools": []
+}

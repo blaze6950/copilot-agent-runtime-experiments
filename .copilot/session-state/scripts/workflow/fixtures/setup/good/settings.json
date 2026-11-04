@@ -1,0 +1,7 @@
+{
+  "model": "gpt-x",
+  "enabledFeatureFlags": { "EXTENSIONS": true },
+  "extensions": { "mode": "cache-keeper" },
+  "statusLine": { "type": "command", "command": "node $HOME/.copilot/cli-tools/statusline.mjs" },
+  "disabledSkills": ["diagrams"]
+}

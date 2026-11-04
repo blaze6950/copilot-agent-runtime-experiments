@@ -1,0 +1,7 @@
+{
+  "model": "gpt-x",
+  "enabledFeatureFlags": { "EXTENSIONS": false },
+  "extensions": { "mode": "cache-keeper" },
+  "statusLine": { "type": "command", "command": "pwsh -NoProfile -File $HOME/.copilot/cli-tools/statusline.ps1" },
+  "disabledSkills": ["diagrams", "ghost-skill"]
+}
