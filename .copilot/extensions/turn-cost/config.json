@@ -1,0 +1,18 @@
+{
+  "metrics": {
+    "task": true,
+    "model": true,
+    "status": true,
+    "req": true,
+    "cost": true,
+    "tokens": true,
+    "cache": true,
+    "wall": true,
+    "llm": true,
+    "ttft": false,
+    "tools": true,
+    "gov": true,
+    "wait": true,
+    "other": true
+  }
+}

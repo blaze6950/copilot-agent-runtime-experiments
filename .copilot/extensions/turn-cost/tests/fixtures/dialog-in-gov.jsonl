@@ -1,0 +1,10 @@
+{"type":"user.message","timestamp":"2026-10-23T10:00:00.000Z","data":{"content":"user prompt"}}
+{"type":"assistant.turn_start","timestamp":"2026-10-23T10:00:00.100Z","data":{}}
+{"type":"assistant.usage","timestamp":"2026-10-23T10:00:02.000Z","data":{"model":"m1","inputTokens":1000,"outputTokens":100,"cacheReadTokens":800,"duration":1900,"timeToFirstTokenMs":500,"copilotUsage":{"totalNanoAiu":1000000000}}}
+{"type":"tool.execution_start","timestamp":"2026-10-23T10:00:02.100Z","data":{"toolCallId":"tc1","toolName":"powershell"}}
+{"type":"hook.start","timestamp":"2026-10-23T10:00:02.200Z","data":{"hookInvocationId":"h1","hookType":"preToolUse","input":{"toolCalls":[{"id":"tc1"}]}}}
+{"type":"elicitation.requested","timestamp":"2026-10-23T10:00:03.000Z","data":{"requestId":"e1","toolCallId":"tc1"}}
+{"type":"elicitation.completed","timestamp":"2026-10-23T10:00:13.000Z","data":{"requestId":"e1"}}
+{"type":"hook.end","timestamp":"2026-10-23T10:00:14.000Z","data":{"hookInvocationId":"h1","hookType":"preToolUse","success":true}}
+{"type":"tool.execution_complete","timestamp":"2026-10-23T10:00:15.000Z","data":{"toolCallId":"tc1","success":true}}
+{"type":"session.idle","timestamp":"2026-10-23T10:00:16.000Z","data":{}}
