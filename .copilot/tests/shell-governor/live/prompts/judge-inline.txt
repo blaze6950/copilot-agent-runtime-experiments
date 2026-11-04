@@ -1,0 +1,2 @@
+Use the powershell tool exactly once with this exact command text, changing nothing: node -e "console.log(1)"
+Do not use any other tool and do not improvise. After the tool call has finished, reply with the single word DONE.

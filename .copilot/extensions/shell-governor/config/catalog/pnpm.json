@@ -1,0 +1,16 @@
+{
+  "tool": "pnpm",
+  "executables": ["pnpm", "pnpm.cmd"],
+  "source": "dotnet/python/node report (S4); split from the former node.json array",
+  "caseSensitive": false,
+  "posix": false,
+  "valueFlags": ["--filter", "-F", "--dir", "-C"],
+  "effectiveCwdFlags": ["-C", "--dir"],
+  "ops": [
+    { "id": "pnpm.read", "class": "read", "anyPos": ["list", "ls", "why", "outdated", "--version", "-v"] },
+    { "id": "pnpm.install-global", "class": "install", "anyPos": ["install", "i", "add"], "anyFlag": ["-g", "--global"] },
+    { "id": "pnpm.script", "class": "execute-code", "execKind": "pkgscript", "anyPos": ["run", "test", "build", "exec", "start"] },
+    { "id": "pnpm.install-project", "class": "install", "anyPos": ["install", "i", "add"] }
+  ],
+  "default": "unknown"
+}

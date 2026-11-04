@@ -1,0 +1,13 @@
+{
+  "tool": "cmd",
+  "executables": ["cmd", "cmd.exe"],
+  "source": "core PowerShell report (S4): cmd /c literal = pass-through (inner cmd text parsed with the cmd table); non-literal = dynamic",
+  "caseSensitive": false,
+  "posix": false,
+  "slashFlags": true,
+  "valueFlags": [],
+  "ops": [
+    { "id": "cmd.inline", "class": "pass-through", "anyFlag": ["/c", "/k"] }
+  ],
+  "default": "unknown"
+}

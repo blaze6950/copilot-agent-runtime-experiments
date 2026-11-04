@@ -1,0 +1,14 @@
+{
+  "tool": "pip",
+  "executables": ["pip", "pip.exe", "pip3", "pip3.exe"],
+  "source": "dotnet/python/node report (S4): install = install (global unless venv); split from the former node.json array",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-r", "--requirement", "-i", "--index-url", "-c", "--constraint", "-t", "--target"],
+  "ops": [
+    { "id": "pip.read", "class": "read", "anyPos": ["list", "show", "freeze"] },
+    { "id": "pip.version", "class": "read", "anyFlag": ["--version", "-V"] },
+    { "id": "pip.install", "class": "install", "anyPos": ["install"] }
+  ],
+  "default": "unknown"
+}

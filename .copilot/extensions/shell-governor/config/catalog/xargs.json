@@ -1,0 +1,10 @@
+{
+  "tool": "xargs",
+  "executables": ["xargs", "xargs.exe"],
+  "source": "other-tools report (S4): inner command not captured; class unknown; split from the former text-tools.json array",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-I", "-n", "-P", "-d"],
+  "ops": [],
+  "default": "unknown"
+}

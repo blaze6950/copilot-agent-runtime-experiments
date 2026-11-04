@@ -1,0 +1,7 @@
+{
+  "Rules": ["Fixture: shared rules."],
+  "CliTools": [
+    { "Name": "git", "PathHint": "C:\\Tools\\git.exe", "UseCase": "Fixture shared tool." },
+    { "Name": "rg", "PathHint": "C:\\Tools\\rg.exe", "UseCase": "Fixture shared tool." }
+  ]
+}

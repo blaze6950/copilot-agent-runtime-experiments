@@ -1,0 +1,29 @@
+{
+  "tool": "aws",
+  "executables": ["aws", "aws.exe"],
+  "providerHosts": ["amazonaws.com"],
+  "source": "cloud/infra report (S4): verb-prefix tables; [V] s3 cp download, secretsmanager get-secret-value, ssm --with-decryption; [I] s3 cp upload direction",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["--region", "--profile", "--output", "--query", "--endpoint-url", "--cli-input-json", "--cli-input-yaml", "--name", "--bucket", "--key", "--filters", "--max-items", "--page-size", "--starting-token", "--color", "--cli-connect-timeout", "--cli-read-timeout"],
+  "pathFlags": {},
+  "positionalPaths": false,
+  "ops": [
+    { "id": "aws.help", "class": "read", "anyFlag": ["--help", "help"] },
+    { "id": "aws.sts.identity", "class": "read-remote", "pos": ["sts"], "anyPos": ["get-caller-identity", "get-access-key-info"] },
+    { "id": "aws.sts.credential", "class": "credential", "pos": ["sts"], "anyPos": ["get-session-token", "get-federation-token", "assume-role"] },
+    { "id": "aws.sso", "class": "auth", "pos": ["sso"], "anyPos": ["login", "logout"] },
+    { "id": "aws.configure.read", "class": "read", "pos": ["configure"], "anyPos": ["list-profiles", "get", "list"] },
+    { "id": "aws.configure.write", "class": "auth", "pos": ["configure"] },
+    { "id": "aws.secret", "class": "credential", "pos": ["secretsmanager"], "anyPos": ["get-secret-value"] },
+    { "id": "aws.ssm.decrypt", "class": "credential", "pos": ["ssm"], "posPrefix": { "i": 1, "p": ["get-parameter"] }, "anyFlag": ["--with-decryption"] },
+    { "id": "aws.s3.download", "class": "download", "pos": ["s3", "cp"] },
+    { "id": "aws.s3.rm", "class": "remote-destructive", "pos": ["s3"], "anyPos": ["rm", "rb"] },
+    { "id": "aws.read", "class": "read-remote", "posPrefix": { "i": 1, "p": ["describe-", "list-", "get-", "head-", "check-", "lookup-", "search-", "batch-get-", "validate-", "estimate-", "query-", "scan-"] } },
+    { "id": "aws.delete", "class": "remote-destructive", "posPrefix": { "i": 1, "p": ["delete-", "terminate-", "destroy-", "remove-", "purge-", "empty-"] } },
+    { "id": "aws.cost", "class": "cost", "posPrefix": { "i": 1, "p": ["run-instances", "start-instances", "start-db-instance", "start-db-cluster", "create-db-instance", "create-cluster"] } },
+    { "id": "aws.execute", "class": "remote-write", "posPrefix": { "i": 1, "p": ["invoke-", "run-command", "send-command", "start-session", "execute-", "run-task"] } },
+    { "id": "aws.write", "class": "remote-write", "posPrefix": { "i": 1, "p": ["create-", "put-", "update-", "modify-", "start-", "stop-", "reboot-", "reset-", "set-", "tag-", "untag-", "enable-", "disable-", "attach-", "detach-", "register-", "deregister-", "add-", "revoke-", "authorize-", "import-", "export-", "restore-", "upload-", "copy-", "rotate-", "cancel-", "associate-", "disassociate-"] } }
+  ],
+  "default": "unknown"
+}

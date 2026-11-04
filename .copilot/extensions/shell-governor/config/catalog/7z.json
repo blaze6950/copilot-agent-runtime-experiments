@@ -1,0 +1,16 @@
+{
+  "tool": "7z",
+  "executables": ["7z", "7z.exe"],
+  "source": "other-tools report (S4): subcommand = first positional; l/t read, x/e/a/u write, d/rn delete; split from the former archive-tools.json array",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-o", "-p", "-x", "-i"],
+  "positionalPaths": true,
+  "ops": [
+    { "id": "7z.read", "class": "read", "pos": ["l"] },
+    { "id": "7z.read2", "class": "read", "pos": ["t"] },
+    { "id": "7z.extract", "class": "write", "posPrefix": { "i": 0, "p": ["x", "e", "a", "u"] } },
+    { "id": "7z.delete", "class": "delete", "posPrefix": { "i": 0, "p": ["d", "rn"] } }
+  ],
+  "default": "unknown"
+}

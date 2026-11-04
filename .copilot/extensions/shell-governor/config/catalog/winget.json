@@ -1,0 +1,15 @@
+{
+  "tool": "winget",
+  "executables": ["winget", "winget.exe", "choco", "choco.exe"],
+  "source": "other-tools report (S4): install/upgrade/uninstall = install (ASK-class policy is install -> AI here; the report marked upgrade of the host CLI as DANGER, kept as an open question)",
+  "caseSensitive": false,
+  "posix": false,
+  "valueFlags": ["--id", "--version", "-v", "--source", "-s", "--scope"],
+  "ops": [
+    { "id": "winget.install", "class": "install", "anyPos": ["install", "upgrade", "uninstall", "update"] },
+    { "id": "winget.pin-write", "class": "install", "pos": ["pin"], "anyPos": ["add", "remove", "reset"] },
+    { "id": "winget.source-write", "class": "install", "pos": ["source"], "anyPos": ["add", "remove", "reset"] },
+    { "id": "winget.read", "class": "read", "anyPos": ["list", "search", "show", "--version", "version"] }
+  ],
+  "default": "unknown"
+}

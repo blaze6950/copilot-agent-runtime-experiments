@@ -1,0 +1,1 @@
+Use the powershell tool exactly once with the command Get-Location. Do not use any other tool and do not improvise. After that tool call has finished, reply with the single word DONE.

@@ -1,0 +1,17 @@
+{
+  "tool": "rg",
+  "firstPositionalIsPattern": true,
+  "executables": ["rg", "rg.exe"],
+  "source": "other-tools report (S4): read; --pre / --pre-glob = execute-code (external preprocessor); split from the former text-tools.json array",
+  "caseSensitive": true,
+  "posix": true,
+  "valueFlags": ["-e", "--regexp", "-g", "--glob", "--iglob", "-t", "--type", "-T", "--type-not", "-m", "--max-count", "-A", "-B", "-C", "--context", "--pre", "--pre-glob", "-r", "--replace", "-M", "--max-columns", "--max-depth", "-d", "-E", "--encoding", "--colors", "--sort", "--sortr", "-j", "--threads", "--path-separator", "-f", "--file", "--type-add"],
+  "positionalPaths": true,
+  "recursive": [
+    { "always": true, "bypassFlags": ["--hidden", "-.", "-u", "--unrestricted", "--no-ignore", "--no-ignore-vcs", "--no-ignore-dot", "--no-ignore-global", "--no-ignore-parent", "--no-ignore-files", "--no-ignore-exclude", "--no-ignore-messages", "-L", "--follow"] }
+  ],
+  "ops": [
+    { "id": "rg.pre", "class": "execute-code", "anyFlag": ["--pre", "--pre-glob"] }
+  ],
+  "default": "read"
+}

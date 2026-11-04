@@ -1,0 +1,16 @@
+{
+  "tool": "helm",
+  "executables": ["helm", "helm.exe"],
+  "source": "cloud/infra report (S4): 0 corpus clusters; classes from the report table",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-n", "--namespace", "--kube-context", "-f", "--values", "--set"],
+  "ops": [
+    { "id": "helm.dryrun", "class": "read", "anyFlag": ["--dry-run"] },
+    { "id": "helm.read", "class": "read-remote", "anyPos": ["list", "status", "get", "history", "show", "diff", "search"] },
+    { "id": "helm.read-local", "class": "read", "anyPos": ["template", "lint", "version"] },
+    { "id": "helm.delete", "class": "remote-destructive", "anyPos": ["uninstall", "delete", "rollback"] },
+    { "id": "helm.write", "class": "remote-write", "anyPos": ["install", "upgrade", "repo", "dependency"], "noFlag": ["--dry-run"] }
+  ],
+  "default": "unknown"
+}

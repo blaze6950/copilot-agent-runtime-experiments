@@ -1,0 +1,15 @@
+{
+  "tool": "usql",
+  "executables": ["usql", "usql.exe"],
+  "source": "snow/usql report summary (S4): -c/--command and -f/--file carriers via lib/sql.mjs; stdin piped into usql = unknown; never by DSN",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-c", "--command", "-f", "--file", "--role", "--warehouse"],
+  "pathFlags": {},
+  "positionalPaths": false,
+  "sqlCarrier": { "sub": null, "queryFlags": ["-c", "--command"], "fileFlags": ["-f", "--file"], "remote": true },
+  "ops": [
+    { "id": "usql.help", "class": "read", "anyFlag": ["--help", "-h", "--version", "-V"] }
+  ],
+  "default": "unknown"
+}

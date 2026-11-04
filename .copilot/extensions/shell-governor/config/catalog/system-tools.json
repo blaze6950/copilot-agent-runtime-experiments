@@ -1,0 +1,25 @@
+{
+  "tool": "system-tools",
+  "executables": ["reg", "reg.exe", "sc", "sc.exe", "netsh", "netsh.exe", "schtasks", "schtasks.exe", "icacls", "icacls.exe", "takeown", "takeown.exe", "certutil", "certutil.exe", "bitsadmin", "bitsadmin.exe", "msg", "msg.exe", "explorer", "explorer.exe"],
+  "source": "core PowerShell report (S4): reg/sc/netsh = system; schtasks = persistence; icacls/takeown = privilege; certutil -urlcache and bitsadmin = download; query/list forms = read",
+  "caseSensitive": false,
+  "posix": false,
+  "valueFlags": [],
+  "ops": [
+    { "id": "reg.read", "class": "read", "anyPos": ["query"] },
+    { "id": "reg.write", "class": "system", "anyPos": ["add", "delete", "import", "copy", "save", "restore", "load", "unload"] },
+    { "id": "sc.read", "class": "read", "anyPos": ["query", "queryex"] },
+    { "id": "sc.write", "class": "system", "anyPos": ["create", "config", "delete", "stop", "start", "failure", "sdset"] },
+    { "id": "netsh.any", "class": "system" },
+    { "id": "schtasks.read", "class": "read", "anyPos": ["query"] },
+    { "id": "schtasks.write", "class": "persistence", "anyPos": ["create", "change", "delete", "run", "end"] },
+    { "id": "icacls.list", "class": "read", "maxPos": 1 },
+    { "id": "icacls.write", "class": "privilege", "minPos": 2 },
+    { "id": "takeown.any", "class": "privilege" },
+    { "id": "certutil.urlcache", "class": "download", "anyFlag": ["-urlcache"] },
+    { "id": "bitsadmin.any", "class": "download" },
+    { "id": "msg.any", "class": "unknown" },
+    { "id": "explorer.any", "class": "unknown" }
+  ],
+  "default": "unknown"
+}

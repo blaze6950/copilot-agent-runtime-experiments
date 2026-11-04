@@ -1,0 +1,21 @@
+{
+  "tool": "python",
+  "executables": ["python", "python.exe", "python3", "python3.exe", "py", "py.exe"],
+  "source": "dotnet/python/node report (S4): -c and stdin = execute-code (inline scan not applied in S4); -m module and constant .py in cwd = execute-code; -m pip install = install (global)",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-c", "-m", "-W", "-X", "-Q"],
+  "pathFlags": {},
+  "positionalPaths": true,
+  "ops": [
+    { "id": "python.version", "class": "read", "anyFlag": ["-V", "--version"] },
+    { "id": "python.pip-read", "class": "read", "flagIn": { "-m": ["pip"] }, "anyPos": ["list", "show", "freeze", "--version"] },
+    { "id": "python.pip-install", "class": "install", "flagIn": { "-m": ["pip"] }, "anyPos": ["install"] },
+    { "id": "python.module-test", "class": "execute-code", "execKind": "build", "flagIn": { "-m": ["unittest", "pytest"] } },
+    { "id": "python.inline", "class": "execute-code", "execKind": "inline", "anyFlag": ["-c"] },
+    { "id": "python.script", "class": "execute-code", "execKind": "script", "posRegex": "\\.py$" },
+    { "id": "python.stdin-dash", "class": "execute-code", "execKind": "inline", "anyPos": ["-"] },
+    { "id": "python.stdin", "class": "execute-code", "execKind": "inline", "maxPos": 0, "noFlag": ["-V", "--version", "-c", "-m"] }
+  ],
+  "default": "unknown"
+}

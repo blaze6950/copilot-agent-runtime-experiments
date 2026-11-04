@@ -1,0 +1,15 @@
+{
+  "tool": "grep",
+  "firstPositionalIsPattern": true,
+  "executables": ["grep", "grep.exe"],
+  "source": "other-tools report (S4): read (Git usr/bin grep); split from the former text-tools.json array",
+  "caseSensitive": true,
+  "posix": true,
+  "valueFlags": ["-e", "-f", "-m", "-A", "-B", "-C", "--include", "--exclude", "--exclude-dir"],
+  "positionalPaths": true,
+  "recursive": [
+    { "flags": ["-r", "-R", "--recursive", "--dereference-recursive"], "bypass": true }
+  ],
+  "ops": [],
+  "default": "read"
+}

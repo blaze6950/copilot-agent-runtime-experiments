@@ -1,0 +1,15 @@
+{
+  "tool": "robocopy",
+  "executables": ["robocopy", "robocopy.exe"],
+  "source": "other-tools report (S4): /MIR and /PURGE = delete at destination; /L = read; otherwise write. Windows /switches are parsed as flags (slashFlags); split from the former archive-tools.json array",
+  "caseSensitive": true,
+  "posix": false,
+  "slashFlags": true,
+  "valueFlags": [],
+  "positionalPaths": true,
+  "ops": [
+    { "id": "robocopy.mirror", "class": "delete", "anyFlag": ["/MIR", "/PURGE"] },
+    { "id": "robocopy.list", "class": "read", "anyFlag": ["/L"] }
+  ],
+  "default": "write"
+}

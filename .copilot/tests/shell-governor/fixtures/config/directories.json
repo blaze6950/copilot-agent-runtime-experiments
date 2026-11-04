@@ -1,0 +1,11 @@
+{
+  "_about": "Fixture directory rules (same shape as the governor-draft directories.json). Placeholders: {home} {temp} {appdata} {localappdata} {copilotHome}.",
+  "rules": [
+    { "id": "repo", "repo": true, "level": "normal", "allow": ["read", "write", "delete", "execute"] },
+    { "id": "temp", "pattern": "{temp}\\**", "level": "normal", "allow": ["read", "write", "delete", "execute"] },
+    { "id": "copilot-home", "pattern": "{copilotHome}\\**", "level": "protected", "allow": ["read"] },
+    { "id": "secret-ssh", "pattern": "{home}\\.ssh\\**", "level": "secret", "allow": [] },
+    { "id": "user-secrets", "pattern": "{appdata}\\Microsoft\\UserSecrets\\**", "level": "secret", "allow": [] },
+    { "id": "chrome-profile", "pattern": "{localappdata}\\Google\\Chrome\\User Data\\**", "level": "secret", "allow": [] }
+  ]
+}

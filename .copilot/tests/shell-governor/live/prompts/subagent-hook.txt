@@ -1,0 +1,1 @@
+Dispatch exactly one subagent with the task tool, agent type sub-explorer-code. Its instruction must be exactly: Use the powershell tool exactly once with the command Get-Location, then reply with the command output in one line. Do not run any other tool and do not dispatch any other agent. After the subagent has finished, reply with the single word DONE.

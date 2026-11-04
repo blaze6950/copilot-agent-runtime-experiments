@@ -1,0 +1,15 @@
+{
+  "tool": "pwsh",
+  "executables": ["pwsh", "pwsh.exe", "powershell", "powershell.exe"],
+  "source": "core PowerShell report (S4): -File = script by path (kind script); -Command/-c and -EncodedCommand = pass-through (inner flattened); non-literal inline = dynamic",
+  "caseSensitive": false,
+  "posix": false,
+  "valueFlags": ["-File", "-f", "-Command", "-c", "-EncodedCommand", "-e", "-enc", "-ec", "-ExecutionPolicy", "-ep", "-WorkingDirectory", "-wd", "-InputFormat", "-OutputFormat", "-Settings", "-ConfigurationName"],
+  "pathFlags": { "-File": "execute", "-f": "execute" },
+  "positionalPaths": false,
+  "ops": [
+    { "id": "pwsh.file", "class": "execute-code", "execKind": "script", "anyFlag": ["-File", "-f"] },
+    { "id": "pwsh.inline", "class": "pass-through", "anyFlag": ["-Command", "-c", "-EncodedCommand", "-e", "-enc", "-ec"] }
+  ],
+  "default": "unknown"
+}

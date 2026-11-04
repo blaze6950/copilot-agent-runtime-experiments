@@ -1,0 +1,23 @@
+{
+  "tool": "kubectl",
+  "executables": ["kubectl", "kubectl.exe"],
+  "source": "cloud/infra report (S4): read verbs; exec/cp/port-forward = remote execution; apply/create/... = remote-write; --dry-run=client|server = read; get/describe secret(s) = credential (D-28, conservative: output is not parsed)",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-n", "--namespace", "-c", "--container", "-l", "--selector", "-o", "--output", "-f", "--filename", "--context", "--kubeconfig", "-p", "--patch", "--field-selector", "--timeout", "-t", "--tail", "--since", "-L", "--sort-by", "-s", "--server", "--token", "--certificate-authority", "--cluster", "--user", "--image", "--replicas", "--port", "--type", "--from", "--to", "--records"],
+  "pathFlags": { "-f": "read", "--filename": "read" },
+  "positionalPaths": false,
+  "ops": [
+    { "id": "kubectl.dryrun", "class": "read", "flagValueRegex": { "--dry-run": "^(client|server|none)$" } },
+    { "id": "kubectl.get-secret", "class": "credential", "pos": ["get"], "posRegex": "^secrets?(/|$)" },
+    { "id": "kubectl.describe-secret", "class": "credential", "pos": ["describe"], "posRegex": "^secrets?(/|$)" },
+    { "id": "kubectl.read", "class": "read-remote", "posPrefix": { "i": 0, "p": ["get", "describe", "logs", "top", "version", "explain", "events", "api-resources", "api-versions", "cluster-info", "diff", "wait", "auth"] } },
+    { "id": "kubectl.rollout.read", "class": "read-remote", "pos": ["rollout"], "anyPos": ["status", "history"] },
+    { "id": "kubectl.config.read", "class": "read", "pos": ["config"], "anyPos": ["view", "get-contexts", "current-context"] },
+    { "id": "kubectl.config.switch", "class": "auth", "pos": ["config"], "anyPos": ["use-context", "set-context", "set-cluster", "set-credentials", "delete-context"] },
+    { "id": "kubectl.exec", "class": "remote-write", "posPrefix": { "i": 0, "p": ["exec", "cp", "port-forward", "attach", "debug", "run", "proxy"] } },
+    { "id": "kubectl.delete", "class": "remote-destructive", "posPrefix": { "i": 0, "p": ["delete", "drain"] }, "noFlag": ["--dry-run"] },
+    { "id": "kubectl.write", "class": "remote-write", "posPrefix": { "i": 0, "p": ["apply", "create", "replace", "patch", "edit", "label", "annotate", "set", "scale", "autoscale", "expose", "cordon", "uncordon", "taint", "certificate", "rollout"] }, "noFlag": ["--dry-run"] }
+  ],
+  "default": "unknown"
+}

@@ -1,0 +1,15 @@
+{
+  "tool": "node",
+  "executables": ["node", "node.exe"],
+  "source": "dotnet/python/node report (S4): --check and --version = read; -e/-p = execute-code (inline); script = execute-code by path; split from the former node.json array",
+  "caseSensitive": true,
+  "posix": false,
+  "positionalPaths": true,
+  "valueFlags": ["-e", "--eval", "-p", "--print", "-r", "--require", "--import", "--loader"],
+  "ops": [
+    { "id": "node.check-version", "class": "read", "anyFlag": ["--check", "-c", "--version", "-v"] },
+    { "id": "node.eval", "class": "execute-code", "execKind": "inline", "anyFlag": ["-e", "--eval", "-p", "--print"] },
+    { "id": "node.script", "class": "execute-code", "execKind": "script", "posRegex": "\\.(m|c)?js$" }
+  ],
+  "default": "unknown"
+}

@@ -1,0 +1,21 @@
+{
+  "tool": "npm",
+  "executables": ["npm", "npm.cmd"],
+  "source": "dotnet/python/node report (S4): run/test/start/build = execute-code (package scripts); install without --ignore-scripts = execute-code (lifecycle); install -g = install (global); publish = publish; split from the former node.json array",
+  "caseSensitive": false,
+  "posix": false,
+  "valueFlags": ["--prefix", "--registry", "--tag", "--workspace", "-w"],
+  "effectiveCwdFlags": ["--prefix"],
+  "ops": [
+    { "id": "npm.read", "class": "read", "anyPos": ["ls", "list", "view", "root", "version", "outdated", "info", "help"] },
+    { "id": "npm.publish", "class": "publish", "anyPos": ["publish", "unpublish", "deprecate"] },
+    { "id": "npm.auth", "class": "admin", "anyPos": ["login", "adduser", "logout", "owner", "access", "token"] },
+    { "id": "npm.install-global", "class": "install", "anyPos": ["install", "i", "add"], "anyFlag": ["-g", "--global"] },
+    { "id": "npm.install-scripts", "class": "execute-code", "anyPos": ["install", "i", "ci", "add"], "noFlag": ["--ignore-scripts", "-g", "--global"] },
+    { "id": "npm.install-project", "class": "install", "anyPos": ["install", "i", "ci", "add"] },
+    { "id": "npm.script", "class": "execute-code", "execKind": "pkgscript", "anyPos": ["run", "run-script", "test", "t", "start", "build", "exec"] },
+    { "id": "npm.uninstall", "class": "write", "anyPos": ["uninstall", "un", "rm", "remove"] },
+    { "id": "npm.config", "class": "unknown", "anyPos": ["config", "cache"] }
+  ],
+  "default": "unknown"
+}

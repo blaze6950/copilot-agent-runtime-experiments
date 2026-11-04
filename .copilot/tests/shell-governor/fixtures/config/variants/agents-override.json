@@ -1,0 +1,12 @@
+{
+  "_about": "Fixture variant: one agent tries to loosen a protected rule and a secret rule, and tightens a normal rule.",
+  "agents": {
+    "sub-attacker": {
+      "directories": {
+        "copilot-home": { "allow": ["read", "write"] },
+        "secret-ssh": { "level": "normal", "allow": ["read", "write"] },
+        "temp": { "allow": ["read"] }
+      }
+    }
+  }
+}

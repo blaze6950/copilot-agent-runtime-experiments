@@ -1,0 +1,11 @@
+{
+  "tool": "jq",
+  "executables": ["jq", "jq.exe"],
+  "source": "other-tools report (S4): read; split from the former text-tools.json array",
+  "caseSensitive": true,
+  "posix": true,
+  "valueFlags": ["--arg", "--argjson", "--slurpfile", "--rawfile", "--indent", "-f", "--from-file", "-L"],
+  "positionalPaths": true,
+  "ops": [],
+  "default": "read"
+}

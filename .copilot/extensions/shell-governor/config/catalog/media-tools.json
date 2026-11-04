@@ -1,0 +1,17 @@
+{
+  "tool": "media-tools",
+  "executables": ["ffmpeg", "ffmpeg.exe", "ffprobe", "ffprobe.exe", "magick", "magick.exe", "yt-dlp", "yt-dlp.exe", "pandoc", "pandoc.exe", "exiftool", "exiftool.exe", "openssl", "openssl.exe", "chcp", "chcp.com"],
+  "source": "other-tools report long tail (S4, inferred): ffprobe read; ffmpeg write; magick identify read else write; yt-dlp download; pandoc -o write else read; exiftool write flags; openssl x509/-noout/-text read; chcp read",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-o", "-i", "-c"],
+  "pathFlags": { "-o": "write" },
+  "positionalPaths": true,
+  "ops": [
+    { "id": "media.yt-dlp", "class": "download", "anyPos": ["yt-dlp"] },
+    { "id": "media.pandoc.write", "class": "write", "anyFlag": ["-o", "--output"] },
+    { "id": "media.exiftool.write", "class": "write", "anyFlag": ["-overwrite_original", "-delete_original", "-w"] },
+    { "id": "media.openssl.read", "class": "read", "anyFlag": ["-noout", "-text"] }
+  ],
+  "default": "write"
+}

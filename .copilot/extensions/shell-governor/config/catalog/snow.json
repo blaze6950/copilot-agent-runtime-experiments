@@ -1,0 +1,18 @@
+{
+  "tool": "snow",
+  "executables": ["snow", "snow.exe"],
+  "source": "snow/usql report summary (S4): SQL carrier -q/--query and -f/--filename classified by lib/sql.mjs; never classified by connection/role/warehouse; non-SQL: version/help = read; connection = unknown. Remote DB: SQL write/delete/admin/execute map to remote-* classes",
+  "caseSensitive": true,
+  "posix": false,
+  "globalWithValue": ["-c", "--connection", "--role", "--warehouse", "--database", "--schema", "--format", "--config-file", "-x"],
+  "globalNoValue": ["--verbose", "--debug", "--silent"],
+  "valueFlags": ["-q", "--query", "-f", "--filename"],
+  "pathFlags": {},
+  "positionalPaths": false,
+  "sqlCarrier": { "sub": "sql", "queryFlags": ["-q", "--query"], "fileFlags": ["-f", "--filename"], "remote": true },
+  "ops": [
+    { "id": "snow.help", "class": "read", "anyFlag": ["--help", "-h", "--version"] },
+    { "id": "snow.version", "class": "read", "pos": ["version"] }
+  ],
+  "default": "unknown"
+}

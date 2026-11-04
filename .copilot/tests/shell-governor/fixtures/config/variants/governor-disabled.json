@@ -1,0 +1,5 @@
+{
+  "_about": "Fixture variant: governor switched off.",
+  "enabled": false,
+  "judge": { "model": "gpt-6-luna", "maxConcurrent": 2, "timeoutMs": 30000, "cacheSize": 500 }
+}

@@ -1,0 +1,19 @@
+{
+  "tool": "terragrunt",
+  "executables": ["terragrunt", "terragrunt.exe"],
+  "source": "cloud/infra report (S4): [V] --version, hcl fmt --check; [I] run-all apply/destroy, hcl fmt write",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["--terragrunt-working-dir", "--working-dir"],
+  "positionalPaths": false,
+  "ops": [
+    { "id": "tg.help.version", "class": "read", "anyFlag": ["--help", "-h", "--version"] },
+    { "id": "tg.hcl-fmt-check", "class": "read", "pos": ["hcl"], "anyPos": ["fmt"], "anyFlag": ["--check"] },
+    { "id": "tg.hcl-fmt-write", "class": "write", "pos": ["hcl"], "anyPos": ["fmt"] },
+    { "id": "tg.read", "class": "read", "anyPos": ["version"] },
+    { "id": "tg.plan", "class": "read-remote", "anyPos": ["plan"] },
+    { "id": "tg.apply", "class": "publish", "anyPos": ["apply", "run", "stack"] },
+    { "id": "tg.destroy", "class": "remote-destructive", "anyPos": ["destroy"] }
+  ],
+  "default": "unknown"
+}

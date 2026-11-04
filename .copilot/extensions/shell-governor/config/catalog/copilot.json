@@ -1,0 +1,18 @@
+{
+  "tool": "copilot",
+  "executables": ["copilot", "copilot.exe"],
+  "source": "other-tools report (S4): allow flags spawn an unattended sub-agent (ASK); -p without allow flags = spawn (AI); plugin install/uninstall = install (AI)",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-p", "--prompt", "--model", "--agent", "--add-dir", "--available-tools", "--output-format", "--disable-mcp-server", "--resume", "--log-dir", "--config-dir", "--reasoning-effort", "--share"],
+  "pathFlags": { "--add-dir": "read" },
+  "positionalPaths": false,
+  "ops": [
+    { "id": "copilot.spawn-allow", "class": "spawn-agent", "allow": true, "anyFlag": ["--allow-all-tools", "--allow-all-paths", "--allow-all", "--yolo", "--allow-all-urls"] },
+    { "id": "copilot.spawn", "class": "spawn-agent", "anyFlag": ["-p", "--prompt"] },
+    { "id": "copilot.plugin", "class": "install", "pos": ["plugin"], "anyPos": ["install", "uninstall", "update"] },
+    { "id": "copilot.read", "class": "read", "anyPos": ["help", "version"] },
+    { "id": "copilot.read-flags", "class": "read", "anyFlag": ["--help", "--version", "-h"] }
+  ],
+  "default": "unknown"
+}

@@ -1,0 +1,16 @@
+{
+  "tool": "hcloud",
+  "executables": ["hcloud", "hcloud.exe"],
+  "source": "cloud/infra report (S4): Group = resource, Verb = action",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["--context", "-o", "--output", "-l", "--selector"],
+  "ops": [
+    { "id": "hcloud.context.auth", "class": "auth", "pos": ["context"], "anyPos": ["use", "create", "delete", "active"] },
+    { "id": "hcloud.read", "class": "read-remote", "anyPos": ["list", "describe", "ssh", "version", "status"] },
+    { "id": "hcloud.delete", "class": "remote-destructive", "anyPos": ["delete", "remove"] },
+    { "id": "hcloud.cost", "class": "cost", "anyPos": ["poweron", "reboot", "reset"] },
+    { "id": "hcloud.write", "class": "remote-write", "anyPos": ["create", "add-label", "attach", "detach", "update", "rebuild", "change-type"] }
+  ],
+  "default": "unknown"
+}

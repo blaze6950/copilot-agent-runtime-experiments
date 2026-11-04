@@ -1,0 +1,15 @@
+{
+  "tool": "sqlite3",
+  "executables": ["sqlite3", "sqlite3.exe"],
+  "source": "snow/usql report summary (S4): db file = first positional (path policy); SQL = second positional via lib/sql.mjs; dot-commands via classifySqliteDot",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-cmd", "-separator", "-newline"],
+  "pathFlags": {},
+  "positionalPaths": false,
+  "sqlCarrier": { "sub": null, "dbPositional": 0, "sqlPositional": 1, "remote": false },
+  "ops": [
+    { "id": "sqlite3.version", "class": "read", "anyFlag": ["-version", "--version"] }
+  ],
+  "default": "unknown"
+}

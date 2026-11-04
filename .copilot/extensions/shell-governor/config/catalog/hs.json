@@ -1,0 +1,12 @@
+{
+  "tool": "hs",
+  "executables": ["hs", "hs.exe"],
+  "source": "other-tools report (S4): hs search/status/help = read-remote (AI unless T2)",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["--top"],
+  "ops": [
+    { "id": "hs.read", "class": "read-remote", "anyPos": ["search", "status", "help"] }
+  ],
+  "default": "unknown"
+}

@@ -1,0 +1,5 @@
+{
+  "_about": "Fixture: base governor config. Tests copy this into a sandbox; never edit in place.",
+  "enabled": true,
+  "judge": { "model": "gpt-6-luna", "maxConcurrent": 2, "timeoutMs": 30000, "cacheSize": 500 }
+}

@@ -1,0 +1,17 @@
+{
+  "tool": "docker",
+  "executables": ["docker", "docker.exe"],
+  "source": "cloud/infra report (S4): 0 corpus clusters; compose verb is the 2nd positional",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-f", "--file", "-p", "--project-name", "-e", "--env", "-v", "--volume", "-w", "--workdir", "-u", "--user", "-H", "--host", "-c", "--context"],
+  "ops": [
+    { "id": "docker.read", "class": "read", "anyPos": ["ps", "images", "logs", "inspect", "stats", "version", "info", "port", "top", "history", "events"] },
+    { "id": "docker.compose.read", "class": "read", "pos": ["compose"], "anyPos": ["ps", "config", "logs", "images", "version"] },
+    { "id": "docker.compose.down", "class": "delete", "pos": ["compose"], "anyPos": ["down"] },
+    { "id": "docker.exec", "class": "execute-code", "anyPos": ["exec", "cp", "attach", "run"] },
+    { "id": "docker.delete", "class": "delete", "anyPos": ["rm", "rmi", "kill", "prune"] },
+    { "id": "docker.context", "class": "auth", "pos": ["context"], "anyPos": ["use", "create", "rm"] }
+  ],
+  "default": "unknown"
+}

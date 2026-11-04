@@ -1,0 +1,13 @@
+{
+  "tool": "npx",
+  "executables": ["npx", "npx.cmd"],
+  "source": "dotnet/python/node report (S4): local-dev binaries = execute-code (repo); any other package may download and execute = unknown; split from the former node.json array",
+  "caseSensitive": false,
+  "posix": false,
+  "valueFlags": ["-p", "--package"],
+  "ops": [
+    { "id": "npx.local-dev-bin", "class": "execute-code", "execKind": "devtool", "anyPos": ["ng", "karma", "jest", "tsc", "prettier", "eslint", "tsx", "vitest"], "noFlag": ["-y", "--yes"] },
+    { "id": "npx.any", "class": "execute-code", "execKind": "devtool-any", "noFlag": ["-y", "--yes"] }
+  ],
+  "default": "unknown"
+}

@@ -1,0 +1,2 @@
+{"type":"session.start","timestamp":"2026-10-18T11:00:00.000Z","data":{"context":{"cwd":"C:\\code\\governance-spike\\bench"}}}
+{"type":"tool.execution_start","timestamp":"2026-10-18T11:00:01.000Z","data":{"toolCallId":"b-1","toolName":"powershell","arguments":{"command":"az account get-access-token --query accessToken -o tsv"}}}

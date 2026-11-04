@@ -1,0 +1,29 @@
+{
+  "_about": "Shell governor settings. The config store checks the files by mtime and size; the governor and the engine each reuse a snapshot for 1 s, so a change takes effect on a call within about 2 seconds, without restart. Invalid JSON keeps the last valid version and writes a warning to the audit log. enabled=false makes the governor return no decision (emergency off). Machine paths are placeholders: {home} {temp} {appdata} {localappdata} {copilotHome}. dialog.scriptLines (optional integer) limits the script lines in the approval dialog, with a note that the full script is in the review file; absent or 0 shows the full script.",
+  "enabled": false,
+  "judge": {
+    "_about": "AI judge via one long-running copilot --acp process (no tools). timeoutMs and cacheSize are defaults chosen for T1; tune after the live check.",
+    "model": "gpt-6-luna",
+    "maxConcurrent": 2,
+    "timeoutMs": 30000,
+    "cacheSize": 500
+  },
+  "stage3": {
+    "_about": "Stage-3 policy (user choice 'stricter'): ASK when a hard rating is >= hardThreshold, or another rating is >= softThreshold, or confidence < minConfidence; otherwise ALLOW. A rule verdict of ASK is never lowered by the AI. Relaxations (stage 2, optional; absent = strict): taskMismatchAloneAsksAt — task_mismatch asks only at this value when every other rating is 0; credentialAccessReadOnlyAllowed — credential_access = 1 as the only rating trigger is allowed for a read-only script (classes read and read-remote; intents read; no risky or dynamic-path notes) whose engine rule ids are all in READ_ONLY_RULES (lib/policy.mjs); any other rule id asks.",
+    "hardRatings": ["destructive", "irreversible", "credential_access", "exfiltration"],
+    "hardThreshold": 1,
+    "softThreshold": 2,
+    "minConfidence": 0.7,
+    "taskMismatchAloneAsksAt": 3,
+    "credentialAccessReadOnlyAllowed": true
+  },
+  "worker": {
+    "pwshPath": "pwsh",
+    "idleMs": 600000
+  },
+  "replay": {
+    "_about": "tools/replay.mjs only. excludeCwds: sessions whose cwd is one of these folders or inside one are not replayed (case-insensitive). Placeholders {home} {temp} {copilotHome} are resolved by the replay tool. The --exclude-cwd option adds to this list.",
+    "excludeCwds": ["C:\\code\\governance-spike", "{temp}\\shell-governor-live"]
+  },
+  "codeRoots": ["C:\\code"]
+}

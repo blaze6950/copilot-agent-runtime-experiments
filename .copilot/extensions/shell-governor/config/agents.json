@@ -1,0 +1,31 @@
+{
+  "_about": "Per-agent OVERRIDES only. Access per CLI tool is NOT copied here: it is read at runtime from {copilotHome}\\cli-tools (read-only). An override may tighten any directory rule; it may not loosen a protected or secret rule (rejected with a warning). Shape: { \"agents\": { \"<agent>\": { \"directories\": { \"<rule id>\": { \"level\"?: \"normal|protected|secret\", \"allow\"?: [\"read\", ...] } } } } }. The same three overrides (repo read+execute; session-state-plan and session-state-impl read) apply to every read-only sub-agent; writing agents (sub-worker-*, sub-manager-docs) carry none; report files stay writable through the session-files rule.",
+  "agents": {
+    "sub-explorer-code": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-explorer-debug": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-reviewer-code": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-manager-history": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-planner-implementation": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-ado": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-ado-writer": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-argocd-nonprod": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-argocd-prod": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-aws": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-az": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-backstage": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-db": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-docs": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-edm": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-github": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-gws": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-hetzner": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-k8s-nonprod": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-k8s-prod": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-miro": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-newrelic": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-scalr": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-snow-nonprod": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-snow-prod": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } },
+    "sub-expert-web": { "directories": { "repo": { "allow": ["read", "execute"] }, "session-state-plan": { "allow": ["read"] }, "session-state-impl": { "allow": ["read"] } } }
+  }
+}

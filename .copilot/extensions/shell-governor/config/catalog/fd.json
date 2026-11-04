@@ -1,0 +1,17 @@
+{
+  "tool": "fd",
+  "firstPositionalIsPattern": true,
+  "executables": ["fd", "fd.exe"],
+  "source": "other-tools report (S4): read; -x/-X exec = execute-code; split from the former text-tools.json array",
+  "caseSensitive": true,
+  "posix": true,
+  "valueFlags": ["-d", "--max-depth", "-t", "--type", "-e", "--extension", "-E", "--exclude", "-S", "--size", "--changed-within", "--changed-before", "-j", "--threads", "-x", "--exec", "-X", "--exec-batch"],
+  "positionalPaths": true,
+  "recursive": [
+    { "always": true, "bypassFlags": ["-H", "--hidden", "-I", "--no-ignore", "-u", "--unrestricted", "--no-ignore-vcs", "--no-ignore-dot", "--no-ignore-parent", "-L", "--follow"] }
+  ],
+  "ops": [
+    { "id": "fd.exec", "class": "execute-code", "anyFlag": ["-x", "--exec", "-X", "--exec-batch"] }
+  ],
+  "default": "read"
+}

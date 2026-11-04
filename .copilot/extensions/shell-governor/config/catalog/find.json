@@ -1,0 +1,15 @@
+{
+  "tool": "find",
+  "executables": ["find", "find.exe"],
+  "source": "other-tools report (S4): GNU find assumed; -exec = execute-code (inner not captured); -delete = delete; -fprint* = write; split from the former text-tools.json array",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-name", "-type", "-path", "-iname", "-maxdepth", "-mindepth", "-newer", "-size", "-mtime"],
+  "positionalPaths": true,
+  "ops": [
+    { "id": "find.exec", "class": "unknown", "anyFlag": ["-exec", "-execdir", "-ok", "-okdir"] },
+    { "id": "find.delete", "class": "delete", "anyFlag": ["-delete"] },
+    { "id": "find.write", "class": "write", "anyFlag": ["-fprint", "-fprint0", "-fprintf", "-fls"] }
+  ],
+  "default": "read"
+}

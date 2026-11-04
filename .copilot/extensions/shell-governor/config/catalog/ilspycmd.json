@@ -1,0 +1,14 @@
+{
+  "tool": "ilspycmd",
+  "executables": ["ilspycmd", "ilspycmd.exe"],
+  "source": "other-tools report (S4): -p/-o write output; -t/-l read",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-p", "--project", "-o", "--outputdir", "-t", "--type", "-v", "--version"],
+  "pathFlags": { "-o": "write", "-p": "write", "--outputdir": "write" },
+  "positionalPaths": true,
+  "ops": [
+    { "id": "ilspy.write", "class": "write", "anyFlag": ["-p", "--project", "-o", "--outputdir"] }
+  ],
+  "default": "read"
+}

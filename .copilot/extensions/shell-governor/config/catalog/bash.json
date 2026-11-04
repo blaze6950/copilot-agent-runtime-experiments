@@ -1,0 +1,12 @@
+{
+  "tool": "bash",
+  "executables": ["bash", "bash.exe", "sh", "sh.exe", "wsl", "wsl.exe"],
+  "source": "other-tools report (S4): interpreter = execute-code (default); wsl -l/-q = read",
+  "caseSensitive": false,
+  "posix": false,
+  "valueFlags": ["-c", "-d", "--distribution"],
+  "ops": [
+    { "id": "wsl.list", "class": "read", "anyFlag": ["-l", "--list"] }
+  ],
+  "default": "execute-code"
+}

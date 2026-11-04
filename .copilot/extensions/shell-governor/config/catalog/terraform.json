@@ -1,0 +1,20 @@
+{
+  "tool": "terraform",
+  "executables": ["terraform", "terraform.exe", "tofu", "tofu.exe"],
+  "source": "cloud/infra report (S4): [V] fmt -check, version; [I] apply/destroy/plan -out (apply -> publish, destroy -> remote-destructive)",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-chdir"],
+  "positionalPaths": false,
+  "ops": [
+    { "id": "tf.fmt.check", "class": "read", "pos": ["fmt"], "anyFlag": ["-check", "--check"] },
+    { "id": "tf.fmt.write", "class": "write", "pos": ["fmt"] },
+    { "id": "tf.read", "class": "read", "anyPos": ["version", "validate", "show", "output", "providers", "graph"] },
+    { "id": "tf.plan", "class": "read-remote", "pos": ["plan"] },
+    { "id": "tf.init", "class": "write", "pos": ["init"] },
+    { "id": "tf.apply", "class": "publish", "pos": ["apply"] },
+    { "id": "tf.destroy", "class": "remote-destructive", "pos": ["destroy"] },
+    { "id": "tf.remote-write", "class": "remote-write", "anyPos": ["import", "taint", "untaint", "force-unlock"] }
+  ],
+  "default": "unknown"
+}

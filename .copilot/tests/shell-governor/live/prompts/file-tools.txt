@@ -1,0 +1,5 @@
+Do these steps in order, each exactly once, and use no other tools:
+1. Use the create tool to create the file {PROJECT}\live-file.txt with the content: hello one
+2. Use the edit tool on the same file {PROJECT}\live-file.txt to replace the text hello one with hello two.
+3. Use the powershell tool with the command Get-Location.
+Do not improvise. In your final reply write the single word DONE, then on the same line write whether you have a tool named apply_patch (yes or no). Do not use apply_patch.

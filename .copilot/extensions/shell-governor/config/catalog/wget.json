@@ -1,0 +1,12 @@
+{
+  "tool": "wget",
+  "executables": ["wget", "wget.exe"],
+  "source": "other-tools report (S4): download by default; --post-data/--post-file = remote-write",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": ["-O", "-P", "--post-data", "--post-file"],
+  "ops": [
+    { "id": "wget.post", "class": "remote-write", "anyFlag": ["--post-data", "--post-file"] }
+  ],
+  "default": "download"
+}

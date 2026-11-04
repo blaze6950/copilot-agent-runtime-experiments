@@ -1,0 +1,9 @@
+{"type":"session.start","timestamp":"2026-10-18T10:00:00.000Z","data":{"context":{"cwd":"C:\\replay-fixture\\app"}}}
+{"type":"user.message","timestamp":"2026-10-18T10:00:01.000Z","data":{"content":"synthetic fixture message"}}
+{"type":"tool.execution_start","timestamp":"2026-10-18T10:00:02.000Z","data":{"toolCallId":"a-1","toolName":"powershell","arguments":{"command":"git status 'unterminated"}}}
+{"type":"tool.execution_start","timestamp":"2026-10-18T10:00:03.000Z","data":{"toolCallId":"a-2","toolName":"powershell","arguments":{"command":"Get-Content README.md"}}}
+{"type":"tool.execution_start","timestamp":"2026-10-18T10:00:04.000Z","data":{"toolCallId":"a-3","toolName":"powershell","arguments":{"command":"az account get-access-token --query accessToken -o tsv"}}}
+{"type":"tool.execution_start","timestamp":"2026-10-18T10:00:05.000Z","data":{"toolCallId":"a-4","toolName":"powershell","arguments":{"command":"& $v x"}}}
+{"type":"tool.execution_start","timestamp":"2026-10-18T10:00:06.000Z","data":{"toolCallId":"a-5","toolName":"view","arguments":{"path":"C:\\replay-fixture\\app\\README.md"}}}
+{"type":"subagent.started","timestamp":"2026-10-18T10:00:07.000Z","agentId":"sub-1","data":{"agentName":"sub-worker-main","toolCallId":"a-6"}}
+{"type":"tool.execution_start","timestamp":"2026-10-18T10:00:08.000Z","agentId":"sub-1","data":{"toolCallId":"a-7","toolName":"powershell","arguments":{"command":"az account get-access-token --query accessToken -o tsv"}}}

@@ -1,0 +1,16 @@
+{
+  "tool": "text-readers",
+  "executables": ["head", "head.exe", "tail", "tail.exe", "wc", "wc.exe", "findstr", "findstr.exe", "tree", "tree.com", "sed", "sed.exe"],
+  "source": "other-tools report (S4): read; sed -i = write; Windows switches are not captured by the parser (findstr, tree); split from the former text-tools.json array",
+  "caseSensitive": true,
+  "posix": true,
+  "valueFlags": ["-n", "-c", "-e", "-f", "-s", "-i"],
+  "positionalPaths": true,
+  "recursive": [
+    { "exe": ["findstr", "findstr.exe"], "slashFlags": ["/s"], "bypass": true }
+  ],
+  "ops": [
+    { "id": "sed.inplace", "class": "write", "anyFlag": ["-i"] }
+  ],
+  "default": "read"
+}

@@ -1,0 +1,11 @@
+{"type":"session.start","timestamp":"2026-01-01T10:00:00.000Z","agentId":null,"data":{"context":{"cwd":"/synthetic/session-cwd"}}}
+{"type":"user.message","timestamp":"2026-01-01T10:00:01.000Z","agentId":null,"data":{"content":"synthetic user message 1"}}
+{"type":"user.message","timestamp":"2026-01-01T10:00:02.000Z","agentId":null,"data":{"content":"synthetic user message 2"}}
+{"type":"user.message","timestamp":"2026-01-01T10:00:03.000Z","agentId":null,"data":{"content":"synthetic user message 3"}}
+{"type":"tool.execution_start","timestamp":"2026-01-01T10:00:04.000Z","agentId":null,"data":{"toolCallId":"call-task-1","toolName":"task","arguments":{"agent_type":"synthetic-reviewer","name":"synthetic-review","description":"Review the synthetic change set","prompt":"Synthetic dispatch prompt: review the change set."}}}
+{"type":"subagent.started","timestamp":"2026-01-01T10:00:05.000Z","agentId":"agent-A","data":{"toolCallId":"call-task-1","agentName":"sub-synthetic-reviewer","agentDisplayName":"Synthetic Reviewer","agentDescription":"Synthetic reviewer","agentType":"synthetic"}}
+{"type":"assistant.message","timestamp":"2026-01-01T10:00:06.000Z","agentId":null,"data":{"content":"ASSISTANT-SENTINEL-TEXT"}}
+{"type":"tool.execution_complete","timestamp":"2026-01-01T10:00:07.000Z","agentId":null,"data":{"toolCallId":"call-read-1","success":true,"result":{"content":"TOOL-OUTPUT-SENTINEL"}}}
+{"type":"tool.execution_start","timestamp":"2026-01-01T10:00:08.000Z","agentId":null,"data":{"toolCallId":"call-edit-1","toolName":"edit","arguments":{"path":"src/edited.txt","old_str":"a","new_str":"b"}}}
+{"type":"tool.execution_start","timestamp":"2026-01-01T10:00:09.000Z","agentId":null,"data":{"toolCallId":"call-create-1","toolName":"create","arguments":{"path":"src/created.txt","file_text":"synthetic"}}}
+{"type":"tool.execution_start","timestamp":"2026-01-01T10:00:10.000Z","agentId":null,"data":{"toolCallId":"call-patch-1","toolName":"apply_patch","arguments":{"input":"*** Begin Patch\n*** Update File: src/patched.txt\n@@\n-old\n+new\n*** Add File: src/added.txt\n+synthetic\n*** End Patch"}}}

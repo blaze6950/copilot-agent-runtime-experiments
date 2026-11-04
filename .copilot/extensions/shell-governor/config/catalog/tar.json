@@ -1,0 +1,15 @@
+{
+  "tool": "tar",
+  "executables": ["tar", "tar.exe"],
+  "source": "other-tools report (S4): POSIX-style packed flags (xf = x + f); -c/-x/-r/-u/-a write, -t read; split from the former archive-tools.json array",
+  "caseSensitive": true,
+  "posix": true,
+  "valueFlags": ["-f", "--file", "-C", "--directory"],
+  "effectiveCwdFlags": ["-C"],
+  "positionalPaths": true,
+  "ops": [
+    { "id": "tar.write", "class": "write", "anyFlag": ["-c", "-x", "-r", "-u", "-a", "--create", "--extract", "--append", "--update"] },
+    { "id": "tar.read", "class": "read", "anyFlag": ["-t", "--list"] }
+  ],
+  "default": "unknown"
+}

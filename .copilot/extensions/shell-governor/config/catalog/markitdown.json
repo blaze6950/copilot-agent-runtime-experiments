@@ -1,0 +1,11 @@
+{
+  "tool": "markitdown",
+  "executables": ["markitdown", "markitdown.exe"],
+  "source": "other-tools report (S4): read; redirect target decides write",
+  "caseSensitive": true,
+  "posix": false,
+  "valueFlags": [],
+  "positionalPaths": true,
+  "ops": [],
+  "default": "read"
+}

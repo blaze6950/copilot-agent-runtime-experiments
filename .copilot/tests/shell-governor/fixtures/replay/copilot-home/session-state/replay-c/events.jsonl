@@ -1,0 +1,2 @@
+{"type":"session.start","timestamp":"2026-10-18T12:00:00.000Z","data":{"context":{"cwd":"C:\\synthetic-temp\\shell-governor-live\\run1"}}}
+{"type":"tool.execution_start","timestamp":"2026-10-18T12:00:01.000Z","data":{"toolCallId":"c-1","toolName":"powershell","arguments":{"command":"az account get-access-token --query accessToken -o tsv"}}}

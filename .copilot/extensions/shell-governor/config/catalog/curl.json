@@ -1,0 +1,19 @@
+{
+  "tool": "curl",
+  "executables": ["curl", "curl.exe"],
+  "source": "other-tools report (S4): GET to stdout = read-remote (AI unless T2); -o/-O = download; POST/PUT/PATCH/-d/-F/-T = remote-write; DELETE = remote-destructive; -u = unknown (credentials)",
+  "caseSensitive": true,
+  "posix": true,
+  "valueFlags": ["-X", "--request", "-d", "--data", "--data-binary", "--data-raw", "--data-ascii", "--data-urlencode", "-F", "--form", "-T", "--upload-file", "-H", "--header", "-o", "--output", "-u", "--user", "--oauth2-bearer", "-A", "--user-agent", "-e", "--referer", "-m", "--max-time", "--connect-timeout", "-w", "--write-out", "-x", "--proxy", "-b", "--cookie", "-c", "--cookie-jar", "-K", "--config", "--cacert", "--cert", "--key", "-r", "--range", "-C", "--continue-at", "--retry", "--json"],
+  "pathFlags": { "-o": "write", "--output": "write" },
+  "positionalPaths": false,
+  "ops": [
+    { "id": "curl.publish", "class": "remote-write", "anyFlag": ["-d", "--data", "--data-binary", "--data-raw", "--data-ascii", "--data-urlencode", "-F", "--form", "-T", "--upload-file", "--json"] },
+    { "id": "curl.method-write", "class": "remote-write", "flagIn": { "-X": ["POST", "PUT", "PATCH"], "--request": ["POST", "PUT", "PATCH"] } },
+    { "id": "curl.method-delete", "class": "remote-destructive", "flagIn": { "-X": ["DELETE"], "--request": ["DELETE"] } },
+    { "id": "curl.method-nonconst", "class": "unknown", "flagNonConst": ["-X", "--request"] },
+    { "id": "curl.download", "class": "download", "anyFlag": ["-o", "--output", "-O", "--remote-name", "--remote-name-all"] },
+    { "id": "curl.credential", "class": "unknown", "anyFlag": ["-u", "--user", "--oauth2-bearer"] }
+  ],
+  "default": "read-remote"
+}

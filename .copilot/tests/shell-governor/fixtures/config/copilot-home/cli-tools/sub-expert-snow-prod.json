@@ -1,0 +1,7 @@
+{
+  "IncludeShell": true,
+  "Rules": ["Fixture: production only, read-only."],
+  "CliTools": [
+    { "Name": "snow", "PathHint": "C:\\Tools\\snow.exe", "Access": "read-only", "UseCase": "Fixture prod connection." }
+  ]
+}

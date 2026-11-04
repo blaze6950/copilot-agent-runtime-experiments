@@ -1,0 +1,13 @@
+{
+  "tool": "yq",
+  "executables": ["yq", "yq.exe"],
+  "source": "other-tools report (S4): read; -i/--inplace = write; split from the former text-tools.json array",
+  "caseSensitive": true,
+  "posix": true,
+  "valueFlags": ["-o", "--output-format", "-p", "--input-format"],
+  "positionalPaths": true,
+  "ops": [
+    { "id": "yq.inplace", "class": "write", "anyFlag": ["-i", "--inplace"] }
+  ],
+  "default": "read"
+}
