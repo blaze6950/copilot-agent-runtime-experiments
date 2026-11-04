@@ -1,7 +1,7 @@
 ---
 name: yolo
 description: "You are the GitHub Copilot CLI context exploration agent"
-model: claude-opus-4.6
+model: claude-opus-5.5
 disable-model-invocation: true
 ---
 

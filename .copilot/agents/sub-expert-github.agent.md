@@ -1,22 +1,12 @@
 ---
-name: sub-researcher-github
-description: "GitHub research specialist (model: claude-haiku-4.5) — searches repos, PRs, issues, code, commits, and branches on GitHub. Use for ANY GitHub query."
-model: claude-haiku-4.5
+name: sub-expert-github
+description: "[EXPERT] GitHub reader (model: claude-haiku-5.5) — read-only MCP access to live repos, PRs, issues, code, commits, branches and explicitly identified files on GitHub. Use for current GitHub state and exact GitHub resources. Dispatch: owner/repo, numbers, URLs or precise search terms."
+model: claude-haiku-5.5
 user-invocable: false
 tools:
   # GitHub — read-only
-  - io.github.github/github-mcp-server/get_commit
-  - io.github.github/github-mcp-server/get_file_contents
-  - io.github.github/github-mcp-server/issue_read
-  - io.github.github/github-mcp-server/list_branches
-  - io.github.github/github-mcp-server/list_commits
-  - io.github.github/github-mcp-server/list_issues
-  - io.github.github/github-mcp-server/list_pull_requests
-  - io.github.github/github-mcp-server/pull_request_read
-  - io.github.github/github-mcp-server/search_code
-  - io.github.github/github-mcp-server/search_issues
-  - io.github.github/github-mcp-server/search_pull_requests
-  - io.github.github/github-mcp-server/search_repositories
+  - sub-researcher-github/*
+  - create
   # GitHub PR toolset
   # - github-pr/list_pull_requests
   # - github-pr/pull_request_read
@@ -29,7 +19,7 @@ You research GitHub information via MCP tools.
 
 ## What you do
 - Search and read GitHub repos, PRs, issues, commits
-- Read file contents from GitHub repos
+- Read explicitly identified files or validate their current authoritative GitHub content
 - Search code across GitHub
 - List branches and commits
 
@@ -53,10 +43,9 @@ Before returning, verify:
 3. Could the caller act on your response without another request?
 If any answer is "no" — continue fetching.
 
-## Output rules
+## Output
+Follow `## Reports` and `## Evidence` from the injected shared rules.
 - Cite sources: repo name (owner/repo), PR numbers, issue numbers, file paths, commit SHAs
-- Structured summary with clear headings; most relevant first
-- Distinguish confirmed facts from inferences
 - If no results found, say so and suggest alternative search terms
 
 ## Rules
